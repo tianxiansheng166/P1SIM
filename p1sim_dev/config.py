@@ -44,9 +44,11 @@ def normalize(value):
             raise ValueError('Unsupported '+name)
     if type(result['seed']) is not int or not 0 <= result['seed'] < 2**63:
         raise ValueError('seed must be an integer in [0, 2^63)')
+    if not isinstance(result['scene'], str) or not result['scene']:
+        raise ValueError('scene must be a nonempty string')
     if result['scene'] not in ('developer', 'autoaim'):
         # External world plugins can resolve other scene names.
-        if result['plugins']['world']['entry'] == DEFAULT['plugins']['world']['entry']:
+        if not isinstance(result['plugins']['world'], dict) or result['plugins']['world'].get('entry') == DEFAULT['plugins']['world']['entry']:
             raise ValueError('Unknown built-in scene')
     if type(result['headless']) is not bool or type(result['recording']) is not bool:
         raise ValueError('headless/recording must be boolean')
@@ -56,6 +58,7 @@ def normalize(value):
     if not isinstance(result['namespace'], str) or not all(c.isalnum() or c in '/_' for c in result['namespace']):
         raise ValueError('Invalid namespace')
     allowed_topics = {'image', 'camera_info', 'joint_states', 'imu', 'gimbal_command', 'planner', 'tracker'}
+    result['namespace'] = result['namespace'].strip('/')
     if not isinstance(result['topics'], dict) or set(result['topics'])-allowed_topics:
         raise ValueError('Unknown topic mapping')
     for topic in result['topics'].values():
@@ -64,7 +67,7 @@ def normalize(value):
     workspace = result['workspace']
     if not all(isinstance(workspace[k], str) for k in ('path', 'setup')) or not isinstance(workspace['plugin_paths'], list):
         raise ValueError('Invalid workspace references')
-    if not all(isinstance(p, str) and p.startswith('/user_ws') and '..' not in Path(p).parts for p in workspace['plugin_paths']):
+    if not all(isinstance(p, str) and (p == '/user_ws' or p.startswith('/user_ws/')) and '..' not in Path(p).parts for p in workspace['plugin_paths']):
         raise ValueError('Plugin paths must be within the mounted /user_ws')
     for kind, spec in result['plugins'].items():
         if not isinstance(spec, dict) or set(spec)-{'entry', 'config'} or not isinstance(spec.get('entry'), str) or ':' not in spec['entry'] or not isinstance(spec.get('config'), dict):

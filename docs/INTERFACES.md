@@ -28,8 +28,7 @@ command convention differs, add an explicit conversion at that boundary;
 do not silently invert an algorithm command.
 
 Command pose changes go through Gazebo's `/world/developer/set_pose` service.
-V1 teleports the camera model; it has no inertia, rate/torque limit or actuator
-latency model. Joint/TF state reflects the service-completed requested pose.
+The default compatibility model teleports the camera without inertia, rate/torque limits or actuator delay. Foundation V1 additionally offers opt-in rate/acceleration/saturation/delay configuration. Joint/TF state reflects the service-completed requested pose.
 There can be a transition image during command application. This is a local
 development interface, not an exact sensor/actuator synchronization authority.
 
@@ -58,3 +57,8 @@ The sustained AutoAim profile adds current freshness flags and
 positive), armor/target IDs and `messages.fire_ignored`. Wall-clock callback
 ages remain separate. `dev record` also captures `/p1sim/visibility`. See
 [SUSTAINED_AUTOAIM.md](SUSTAINED_AUTOAIM.md) for timing and projection limits.
+
+
+Foundation adds explicit schema/run/seed/epoch envelopes and plugin-configured
+models while preserving this default ROS interface. See [Foundation](FOUNDATION.md)
+for the complete versioned contract and requested/confirmed timing distinction.

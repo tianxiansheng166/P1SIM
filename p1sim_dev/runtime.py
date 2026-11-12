@@ -45,6 +45,8 @@ class Environment(Node):
         self.gimbal_model = self.registry['gimbal'].step(0.)
         self.applied_velocity = [0., 0.]
         self.last_application_ns = 0
+        self.last_joint_ns = 0
+        self.last_joint_q = [0., 0.]
         self.target_pending = None
         self.target_applied_request = None
         self.target_states = {}
@@ -159,7 +161,9 @@ class Environment(Node):
         joint.header.stamp = stamp
         joint.name = ['gimbal_yaw_joint', 'gimbal_pitch_joint']
         joint.position = [self.yaw, self.pitch]
-        joint.velocity = list(self.applied_velocity)
+        joint_dt = (self.sim_ns-self.last_joint_ns)/1e9
+        joint.velocity = [(q-p)/joint_dt if joint_dt > 0 else 0. for q,p in zip(joint.position,self.last_joint_q)]
+        self.last_joint_ns, self.last_joint_q = self.sim_ns, list(joint.position)
         self.joint_pub.publish(joint)
         imu = Imu()
         imu.header.stamp, imu.header.frame_id = stamp, 'pitch_link'
@@ -274,6 +278,7 @@ class Environment(Node):
             else:
                 raise RuntimeError('Gazebo gimbal pose application failed')
             self.pose_pending = None
+        self.gimbal_model = self.registry['gimbal'].step(self.sim_ns/1e9)
         if self.foundation.phase == 'RESETTING' or self.command is None or tuple(self.gimbal_model['q_rad']) == (self.yaw, self.pitch):
             return
         yaw, pitch = self.gimbal_model['q_rad']

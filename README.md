@@ -94,7 +94,7 @@ Optional environment variables:
 | `P1SIM_PROJECT` | `p1sim-dev` | Compose project name |
 | `P1SIM_USER_WORKSPACE` | bundled examples | User workspace mount |
 | `P1SIM_WORKSPACE_SETUP` | unset | Container path to user ROS setup |
-| `P1SIM_IMAGE` | `p1sim-developer:1.0.0` | Optional user dependency image extended with `Dockerfile.consumer` |
+| `P1SIM_IMAGE` | `p1sim-foundation:1.0.0-rc.1` | Optional user dependency image extended with `Dockerfile.consumer` |
 | `P1SIM_GIMBAL_TOPIC` | `/armor_planner/cmd_gimbal` | Optional AutoAim command subscription, best effort |
 | `P1SIM_SCENE` | `developer` | Generic scene; `autoaim` selects the sustained single-target wide-view profile |
 | `P1SIM_TRACKER_TOPIC` | `/tracker/target` | Optional target status and recording topic |

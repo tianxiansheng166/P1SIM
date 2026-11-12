@@ -45,6 +45,14 @@ class FoundationTest(unittest.TestCase):
         self.assertEqual(reverse.state(.5,initial)['position_m'],reverse.state(1.5,initial)['position_m'])
         self.assertEqual(reverse.state(1.5,initial)['velocity_m_s'],[-1,-2,0])
 
+    def test_exact_unlimited_compatibility_without_clock_advance(self):
+        p = KinematicGimbal()
+        p.configure({})
+        p.start(Context(0,0,'gimbal'))
+        p.submit([1e15,.1],0,1)
+        self.assertEqual(p.step(0)['q_rad'],[1e15,.1])
+        self.assertEqual(p.step(.1)['v_rad_s'],[0.,0.])
+
     def test_gimbal_delay_rate_acceleration_saturation(self):
         p = KinematicGimbal()
         p.configure(dict(application_delay_seconds=.2,rate_limit_rad_s=.5,

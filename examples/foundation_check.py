@@ -41,6 +41,7 @@ try:
     receipt=receipts[0]
     assert all(a['application_time_ns']-a['receipt_time_ns']>=100000000 for a in applications)
     assert any(any(abs(v)>0 for v in j['v']) for j in joints)
+    assert any(j['v']==[0.,0.] and abs(j['q'][0])>.1 for j in joints), 'Stationary JointState velocity did not clear'
     assert all(abs(v)<=.500001 for s in state for v in s['gimbal_model']['v_rad_s'])
     assert all(abs(q)<=.500001 for s in state for q in s['gimbal_model']['q_rad'])
     assert any(t['delivery_time_ns']>t['source_time_ns'] for t in timing)

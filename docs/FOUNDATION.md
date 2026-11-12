@@ -109,8 +109,9 @@ there is no claim of exact image/target/actuator lockstep synchronization.
 `rate_limit_rad_s`, `acceleration_limit_rad_s2`, two-axis `saturation_rad`,
 and `application_delay_seconds` configure a simulation-time model. Pending
 commands are ordered and coalesced at model steps. The model's q/v describe
-its requested trajectory; JointState and applied q/v describe pose-service
-confirmations. Applied velocity is a finite difference of confirmed angles
+its requested trajectory; JointState q describes pose-service confirmations and v is the finite difference
+between successive clock-stamped JointState samples (zero while stationary).
+Applied-event v is the interval average between pose-service confirmations. Applied velocity is a finite difference of confirmed angles
 over simulator time and is not an inertial motor measurement. Bounds constrain
 the selected model, not Gazebo service wall latency. The orientation-only IMU
 retains its unavailable angular velocity/acceleration covariance convention.
@@ -162,7 +163,7 @@ All existing JSON String fields remain. Added envelopes use `schema` and
 `schema_version: 1`, plus run_id/run_key, foundation/interface/plugin versions,
 config_digest, seed, epoch and exact source/release identity. Standard ROS
 messages retain their original types, units and QoS. `/joint_states.velocity`
-is populated with confirmed application finite differences. New reliable
+is populated with successive published-state finite differences. New reliable
 String topics are `/p1sim/state`, `/p1sim/target_state`, `/p1sim/camera_timing`.
 `/p1sim/state` contains lifecycle, plugin identities, target requested/applied
 state, gimbal model/applied state and sensor effects. It publishes periodically

@@ -1,4 +1,5 @@
 """Reference platform models. All times are simulation seconds, angles radians."""
+from collections import deque
 import math
 from pathlib import Path
 from p1sim_dev.plugins import Plugin
@@ -67,17 +68,17 @@ class KinematicGimbal(Plugin):
 
     def configure(self, config):
         fields(config, ('rate_limit_rad_s', 'acceleration_limit_rad_s2', 'saturation_rad', 'application_delay_seconds'))
-        self.rate = number(config.get('rate_limit_rad_s', 1e12), 'rate_limit', .000001)
-        self.accel = number(config.get('acceleration_limit_rad_s2', 1e12), 'acceleration_limit', .000001)
-        self.saturation = vector(config.get('saturation_rad', [1e12, math.pi/2]), 'saturation', 2)
-        if min(self.saturation) <= 0:
+        self.rate = number(config['rate_limit_rad_s'], 'rate_limit', .000001) if 'rate_limit_rad_s' in config else None
+        self.accel = number(config['acceleration_limit_rad_s2'], 'acceleration_limit', .000001) if 'acceleration_limit_rad_s2' in config else None
+        self.saturation = vector(config['saturation_rad'], 'saturation', 2) if 'saturation_rad' in config else [None, math.pi/2]
+        if any(s is not None and s <= 0 for s in self.saturation):
             raise ValueError('Saturation must be positive')
         self.delay_seconds = number(config.get('application_delay_seconds', 0), 'application_delay', 0)
 
     def reset(self, context):
         super().reset(context)
         self.q, self.v, self.goal = [0., 0.], [0., 0.], [0., 0.]
-        self.pending = []
+        self.pending = deque()
         self.last_time = 0.
         self.sequence = self.receipt_time_ns = 0
 
@@ -89,15 +90,19 @@ class KinematicGimbal(Plugin):
         dt = max(0, seconds-self.last_time)
         self.last_time = seconds
         while self.pending and self.pending[0][0] <= seconds:
-            _, goal, self.receipt_time_ns, self.sequence = self.pending.pop(0)
-            self.goal = [max(-s, min(s, g)) for g, s in zip(goal, self.saturation)]
-        if dt > 0:
+            _, goal, self.receipt_time_ns, self.sequence = self.pending.popleft()
+            self.goal = [max(-s, min(s, g)) if s is not None else g for g, s in zip(goal, self.saturation)]
+        if self.rate is None and self.accel is None:
+            self.v = [(g-q)/dt if dt > 0 else 0. for g,q in zip(self.goal,self.q)]
+            self.q = list(self.goal)  # Exact absolute-angle compatibility, including same-clock receipts.
+        elif dt > 0:
             for i in range(2):
                 difference = self.goal[i]-self.q[i]
-                desired = max(-self.rate, min(self.rate, difference/dt))
-                velocity = max(self.v[i]-self.accel*dt, min(self.v[i]+self.accel*dt, desired))
+                desired = max(-self.rate, min(self.rate, difference/dt)) if self.rate is not None else difference/dt
+                velocity = max(self.v[i]-self.accel*dt, min(self.v[i]+self.accel*dt, desired)) if self.accel is not None else desired
                 self.q[i] += velocity*dt
-                self.q[i] = max(-self.saturation[i], min(self.saturation[i], self.q[i]))
+                if self.saturation[i] is not None:
+                    self.q[i] = max(-self.saturation[i], min(self.saturation[i], self.q[i]))
                 self.v[i] = velocity
         return dict(q_rad=list(self.q), v_rad_s=list(self.v), receipt_time_ns=self.receipt_time_ns, command_sequence=self.sequence)
 
