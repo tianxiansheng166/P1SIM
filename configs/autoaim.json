@@ -1,0 +1,9 @@
+{
+  "scene": "autoaim",
+  "seed": 0,
+  "duration_seconds": null,
+  "workspace": {
+    "path": "",
+    "setup": "/user_ws/setup.bash"
+  }
+}

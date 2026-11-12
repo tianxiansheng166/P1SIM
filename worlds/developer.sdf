@@ -13,8 +13,54 @@
       <collision name="ground"><geometry><plane><normal>0 0 1</normal><size>30 30</size></plane></geometry></collision>
       <visual name="ground"><geometry><plane><normal>0 0 1</normal><size>30 30</size></plane></geometry><material><diffuse>0.3 0.35 0.3 1</diffuse></material></visual>
     </link></model>
-    <model name="target"><static>true</static><pose>4 0 1 0 0 0</pose><link name="body">
-      <visual name="plate"><geometry><box><size>0.1 0.6 0.3</size></box></geometry><material><diffuse>1 0.05 0.03 1</diffuse></material></visual>
+    <!-- Project-authored geometric red light bars and seven-segment digit 3. -->
+    <model name="target0"><static>true</static><pose>2 -0.51 1 0 0 0</pose><link name="body">
+<visual name="plate"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.02 0.18 0.125</size></box></geometry><material><ambient>0.015 0.015 0.015 1</ambient><diffuse>0.015 0.015 0.015 1</diffuse><emissive>0.015 0.015 0.015 1</emissive></material></visual>
+<visual name="light_-1"><pose>-0.014 -0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="light_1"><pose>-0.014 0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="digit_horizontal_0"><pose>-0.016 0 -0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_1"><pose>-0.016 0 0 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_2"><pose>-0.016 0 0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_0"><pose>-0.016 -0.017 -0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_1"><pose>-0.016 -0.017 0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="core_0"><pose>-0.021 -0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.004 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+<visual name="core_1"><pose>-0.021 0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.004 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+    </link></model>
+    <model name="target1"><static>true</static><pose>2 -0.17 1 0 0 0</pose><link name="body">
+<visual name="plate"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.02 0.18 0.125</size></box></geometry><material><ambient>0.015 0.015 0.015 1</ambient><diffuse>0.015 0.015 0.015 1</diffuse><emissive>0.015 0.015 0.015 1</emissive></material></visual>
+<visual name="light_-1"><pose>-0.014 -0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="light_1"><pose>-0.014 0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="digit_horizontal_0"><pose>-0.016 0 -0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_1"><pose>-0.016 0 0 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_2"><pose>-0.016 0 0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_0"><pose>-0.016 -0.017 -0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_1"><pose>-0.016 -0.017 0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="core_0"><pose>-0.021 -0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.006 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+<visual name="core_1"><pose>-0.021 0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.006 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+    </link></model>
+    <model name="target2"><static>true</static><pose>2 0.17 1 0 0 0</pose><link name="body">
+<visual name="plate"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.02 0.18 0.125</size></box></geometry><material><ambient>0.015 0.015 0.015 1</ambient><diffuse>0.015 0.015 0.015 1</diffuse><emissive>0.015 0.015 0.015 1</emissive></material></visual>
+<visual name="light_-1"><pose>-0.014 -0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="light_1"><pose>-0.014 0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="digit_horizontal_0"><pose>-0.016 0 -0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_1"><pose>-0.016 0 0 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_2"><pose>-0.016 0 0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_0"><pose>-0.016 -0.017 -0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_1"><pose>-0.016 -0.017 0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="core_0"><pose>-0.021 -0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.008 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+<visual name="core_1"><pose>-0.021 0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.008 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+    </link></model>
+    <model name="target3"><static>true</static><pose>2 0.51 1 0 0 0</pose><link name="body">
+<visual name="plate"><pose>0 0 0 0 0 0</pose><geometry><box><size>0.02 0.18 0.125</size></box></geometry><material><ambient>0.015 0.015 0.015 1</ambient><diffuse>0.015 0.015 0.015 1</diffuse><emissive>0.015 0.015 0.015 1</emissive></material></visual>
+<visual name="light_-1"><pose>-0.014 -0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="light_1"><pose>-0.014 0.0675 0 0 0 0</pose><geometry><box><size>0.008 0.012 0.055</size></box></geometry><material><ambient>1 0.025 0.025 1</ambient><diffuse>1 0.025 0.025 1</diffuse><emissive>1 0.025 0.025 1</emissive></material></visual>
+<visual name="digit_horizontal_0"><pose>-0.016 0 -0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_1"><pose>-0.016 0 0 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_horizontal_2"><pose>-0.016 0 0.032 0 0 0</pose><geometry><box><size>0.008 0.035 0.007</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_0"><pose>-0.016 -0.017 -0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="digit_vertical_1"><pose>-0.016 -0.017 0.016 0 0 0</pose><geometry><box><size>0.008 0.007 0.032</size></box></geometry><material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><emissive>1 1 1 1</emissive></material></visual>
+<visual name="core_0"><pose>-0.021 -0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.01 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
+<visual name="core_1"><pose>-0.021 0.0675 0 0 0 0</pose><geometry><box><size>0.004 0.01 0.053</size></box></geometry><material><ambient>1 0.8 0.8 1</ambient><diffuse>1 0.8 0.8 1</diffuse><emissive>1 0.8 0.8 1</emissive></material></visual>
     </link></model>
     <model name="camera"><static>true</static><pose>0 0 1 0 0 0</pose><link name="camera_link">
       <sensor name="camera" type="camera"><always_on>true</always_on><update_rate>15</update_rate><topic>/camera/image</topic>

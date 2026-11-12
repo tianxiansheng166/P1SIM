@@ -1,8 +1,18 @@
-# P1SIM Developer Edition
+# P1SIM Foundation 1.0 — Developer Edition
 
 A local ROS 2 / Gazebo environment for developing algorithms. Start the world,
 launch your own ROS software, observe sensors, record a bag, and stop.
-No task registration or research qualification is needed.
+No task registration or research qualification is needed for normal developer use.
+
+**中文快速入门：** [从零安装到运行自己的算法](docs/QUICKSTART.zh-CN.md) ·
+[接入自己的 AutoAim 工作区](docs/USER_AUTOAIM.md) ·
+[Foundation 接口与扩展](docs/FOUNDATION.md)
+
+This public distribution is a self-build **CPU-headless developer simulation**.
+It does not download a private container image, model, ROS workspace, or
+experimental ResultPack. It is not a competition-physics/scorer product.
+The first public Foundation package is a preview of the independently
+versioned source distribution; a second-host release acceptance is still open.
 
 ## Quickstart
 
@@ -68,11 +78,31 @@ algorithm nodes and remap their Image, CameraInfo and command topics as needed.
 Do not run a second TF authority for the same simulation frames.
 
 If the mounted workspace provides `rm_interfaces/msg/GimbalCmd`, the optional
-adapter subscribes to `/cmd_gimbal` (radian absolute yaw/pitch, enabled by
+adapter subscribes to `/armor_planner/cmd_gimbal` by default (override using
+`P1SIM_GIMBAL_TOPIC`; radian yaw/pitch commands enabled by
 `control`). Set `P1SIM_WORKSPACE_SETUP` before `up` to load that ABI. `fire` is
 ignored: this development world has no weapon or projectile path. See
 [interfaces](docs/INTERFACES.md) before connecting a different stack version.
 The full private detector/tracker stack and proprietary weights are not bundled.
+
+## Foundation V1: scenarios, batch and extensions
+
+The original `dev bootstrap/doctor/up/run/record/reset/down` flow is unchanged.
+The Foundation adds versioned config/seed/epoch, standard platform observables
+and an extension API. Try the built-in scenes and bounded headless batch:
+
+```bash
+P1SIM_SCENE=autoaim ./p1sim dev up
+./p1sim dev status
+./p1sim dev down
+./p1sim dev batch --config configs/extensions.json --seed 42 --output ./results/example-42
+```
+
+Batch output is a **platform execution receipt**, not a scientific evaluation
+ResultPack. The `autoaim` scene is a developer target presentation and does not
+include detector binaries or private weights. See
+[Foundation configuration and plugin contract](docs/FOUNDATION.md) and the
+[sample external caller](examples/batch_caller.py).
 
 ## Commands and configuration
 
@@ -90,10 +120,14 @@ Optional environment variables:
 | `P1SIM_PROJECT` | `p1sim-dev` | Compose project name |
 | `P1SIM_USER_WORKSPACE` | bundled examples | User workspace mount |
 | `P1SIM_WORKSPACE_SETUP` | unset | Container path to user ROS setup |
+| `P1SIM_IMAGE` | `p1sim-foundation:1.0.0` | Optional compatible image you build locally |
+| `P1SIM_SCENE` | `developer` | `developer` or `autoaim` |
+| `P1SIM_GIMBAL_TOPIC` | `/armor_planner/cmd_gimbal` | Optional gimbal command input |
 
 Use a unique project, port, domain and state directory for each simultaneous
 instance. For repeatable comparisons, reset between runs and record your source
-revision, parameters and bags. V1 ships one static scene; it does not promise
+revision, parameters and bags. V1 ships a generic developer scene and one
+single-target AutoAim presentation. It does not promise
 bitwise deterministic sensor scheduling or a scoring framework.
 
 ## Troubleshooting
@@ -109,7 +143,7 @@ Ubuntu/ROS packages. Rebuilding later can resolve newer apt package revisions;
 retain your image digest for exact binary reproduction. See `release.json`,
 `SHA256SUMS` and `THIRD_PARTY_NOTICES.md` for source and dependency boundaries.
 
-See [observed V1 validation](docs/VALIDATION.md) for the tested consumer and limits.
+See [release scope and limits](docs/RELEASE_NOTES.md) for public preview boundaries.
 
 ## Scope
 

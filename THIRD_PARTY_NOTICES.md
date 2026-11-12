@@ -2,7 +2,8 @@
 
 This repository distributes project-authored Python, configuration, launch code
 and geometric scene descriptions. It does not redistribute private algorithms,
-weights, c37 binaries, competition robot meshes, or task qualification assets.
+weights, private reference binaries, competition robot meshes or internal
+scientific evaluation artifacts.
 
 The Dockerfile installs upstream packages under their own licenses:
 
