@@ -35,7 +35,11 @@ class Environment(Node):
         self.children = children
         self.recorder = None
         self.record_log = None
-        self.counts = dict(clock=0, image=0, camera_info=0, commands=0)
+        self.counts = dict(clock=0, image=0, camera_info=0, commands=0, applied=0,
+                           armors=0, nonempty_armors=0, targets=0, tracking=0, planner=0, control=0)
+        self.autoaim_last = {}
+        self.gimbal_topic = os.environ.get("P1SIM_GIMBAL_TOPIC", "/armor_planner/cmd_gimbal")
+        self.tracker_topic = os.environ.get("P1SIM_TRACKER_TOPIC", "/tracker/target")
         self.last = {}
         self.yaw = self.pitch = 0.0
         self.command = None
@@ -51,16 +55,19 @@ class Environment(Node):
         self.joint_pub = self.create_publisher(JointState, '/joint_states', 10)
         self.imu_pub = self.create_publisher(Imu, '/imu/data', qos_profile_sensor_data)
         self.ack_pub = self.create_publisher(String, '/p1sim/command_received', 10)
+        self.applied_pub = self.create_publisher(String, '/p1sim/gimbal_applied', 10)
         self.create_subscription(Clock, '/clock', self.clock, qos_profile_sensor_data)
         self.create_subscription(Image, '/p1sim/raw_image', self.image, qos_profile_sensor_data)
         self.create_subscription(Vector3, '/p1sim/gimbal_command', self.control, 10)
         # Optional ABI adapter uses the user's own mounted interface package.
         try:
-            from rm_interfaces.msg import GimbalCmd
+            from rm_interfaces.msg import GimbalCmd, Armors, Target
         except ImportError:
             self.autoaim_adapter = False
         else:
-            self.create_subscription(GimbalCmd, '/cmd_gimbal', self.autoaim_control, 10)
+            self.create_subscription(GimbalCmd, self.gimbal_topic, self.autoaim_control, qos_profile_sensor_data)
+            self.create_subscription(Armors, '/detector/armors', self.armors, qos_profile_sensor_data)
+            self.create_subscription(Target, self.tracker_topic, self.target, qos_profile_sensor_data)
             self.autoaim_adapter = True
         self.create_timer(0.02, self.apply_command, clock=rclpy.clock.Clock())
 
@@ -82,7 +89,7 @@ class Environment(Node):
         self.witness('clock')
         stamp = msg.clock
         self.tf.sendTransform([
-            self.transform('odom', 'base_link', stamp, (0, 0, 0), (0., 0., 0., 1.)),
+            self.transform('odom', 'base_link', stamp, (0, 0, -1), (0., 0., 0., 1.)),
             self.transform('base_link', 'yaw_link', stamp, (0, 0, 1), quaternion(0, 0, self.yaw)),
             self.transform('yaw_link', 'pitch_link', stamp, (0, 0, 0), quaternion(0, self.pitch, 0)),
             self.transform('pitch_link', 'camera_link', stamp, (0, 0, 0), (0., 0., 0., 1.))])
@@ -115,18 +122,37 @@ class Environment(Node):
         self.witness('image')
         self.witness('camera_info')
 
-    def autoaim_control(self, msg):
-        if msg.control:
-            command = Vector3(x=float(msg.yaw), y=float(msg.pitch), z=0.)
-            self.control(command)
+    def armors(self, msg):
+        self.witness('armors')
+        self.autoaim_last['armor_count'] = len(msg.armors)
+        if msg.armors:
+            self.witness('nonempty_armors')
 
-    def control(self, msg):
+    def target(self, msg):
+        self.witness('targets')
+        self.autoaim_last['tracking'] = bool(msg.tracking)
+        if msg.tracking:
+            self.witness('tracking')
+
+    def autoaim_control(self, msg):
+        self.witness('planner')
+        receipt = dict(topic=self.gimbal_topic, stamp_sec=msg.header.stamp.sec,
+                       stamp_nanosec=msg.header.stamp.nanosec, frame_id=msg.header.frame_id,
+                       control=bool(msg.control), fire_requested=bool(msg.fire),
+                       yaw_rad=msg.yaw, pitch_rad=msg.pitch, fire_supported=False)
+        self.autoaim_last['planner'] = receipt
+        if msg.control:
+            self.witness('control')
+            command = Vector3(x=float(msg.yaw), y=float(msg.pitch), z=0.)
+            self.control(command, receipt)
+
+    def control(self, msg, receipt=None):
         if not all(math.isfinite(v) for v in (msg.x, msg.y)) or abs(msg.y) > math.pi / 2:
             self.get_logger().warning('Rejected non-finite or out-of-range gimbal command')
             return
         self.command = (msg.x, msg.y)
         self.witness('commands')
-        self.ack_pub.publish(String(data=json.dumps({'yaw_rad': msg.x, 'pitch_rad': msg.y, 'fire_supported': False})))
+        self.ack_pub.publish(String(data=json.dumps(receipt or {'yaw_rad': msg.x, 'pitch_rad': msg.y, 'fire_supported': False})))
 
     def apply_command(self):
         if self.pose_pending is not None:
@@ -135,6 +161,9 @@ class Environment(Node):
             output, _ = self.pose_pending.communicate()
             if self.pose_pending.returncode == 0 and 'data: true' in output:
                 self.yaw, self.pitch = self.pose_applied
+                self.witness("applied")
+                self.applied_pub.publish(String(data=json.dumps(dict(yaw_rad=self.yaw, pitch_rad=self.pitch,
+                    simulation_time_ns=self.get_clock().now().nanoseconds, fire_supported=False))))
             self.pose_pending = None
         if self.command is None or self.command == (self.yaw, self.pitch):
             return
@@ -153,6 +182,8 @@ class Environment(Node):
             ready = all(processes.values()) and all(age.get(key, 99) < 5 for key in ('clock', 'image', 'camera_info'))
             return dict(ready=ready, processes=processes, messages=dict(self.counts), age_seconds=age,
                         gimbal_rad=dict(yaw=self.yaw, pitch=self.pitch), autoaim_adapter=self.autoaim_adapter,
+                        autoaim=dict(command_topic=self.gimbal_topic, tracker_topic=self.tracker_topic,
+                                     nodes=sorted(self.get_node_names()), latest=dict(self.autoaim_last)),
                         recording_directory='/data/bags', recording=self.recorder is not None and self.recorder.poll() is None, mode='developer')
 
 
@@ -168,7 +199,8 @@ class Environment(Node):
             self.record_log = open('/data/recording.log', 'a')
             self.recorder = subprocess.Popen(['ros2', 'bag', 'record', '--use-sim-time', '-o', str(output),
                 '/clock', '/image_raw', '/camera_info', '/tf', '/tf_static', '/joint_states',
-                '/imu/data', '/p1sim/gimbal_command', '/p1sim/command_received'],
+                '/imu/data', '/p1sim/gimbal_command', '/p1sim/command_received', '/p1sim/gimbal_applied',
+                '/detector/armors', self.tracker_topic, self.gimbal_topic],
                 stdout=self.record_log, stderr=subprocess.STDOUT, start_new_session=True)
             return {'recording': name}
 

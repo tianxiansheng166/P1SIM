@@ -1,0 +1,206 @@
+{
+  "consumer_base": "c37eca1057d6a78945ec3ee8c9840db837411340",
+  "consumer_with_bringup": "f380dde98d880fcd57d5e8f24dc0a76643fb6909",
+  "consumer_algorithm_changes": false,
+  "launch": "ros2 launch rm_vision_bringup vision_bringup.launch.py camera:=external inference_device:=CPU",
+  "runtime": "Ubuntu 22.04 / ROS Humble / OpenVINO 2023.3 CPU / Gazebo Fortress / Mesa",
+  "asset_boundary": "Owner-installed 0526 XML/BIN, read-only; no source or models redistributed; private submodule access unavailable",
+  "model_sha256": {
+    "0526.xml": "996c50dd1a52ffcbe6ff657bc98ff073e5545e2a232c3951e9002cadc471cdf0",
+    "0526.bin": "5ad4c00119b957e345d9b0a591be2e42fd77baadade8fce87d4a7902b275d699"
+  },
+  "observed_loop": {
+    "source_time_tf": {
+      "sec": 6,
+      "nanosec": 470000000,
+      "frame": "camera_optical_frame",
+      "camera_info_sec": 6
+    },
+    "nonempty_armors": {
+      "count": 1,
+      "stamp_sec": 5
+    },
+    "tracking": {
+      "id": "three",
+      "stamp_sec": 6
+    },
+    "control": {
+      "yaw": 0.08503616193876215,
+      "pitch": -0.020770676658681365,
+      "fire": false
+    },
+    "loop_closure": {
+      "planner_receipt": {
+        "topic": "/armor_planner/cmd_gimbal",
+        "stamp_sec": 6,
+        "stamp_nanosec": 470000000,
+        "frame_id": "odom",
+        "control": true,
+        "fire_requested": false,
+        "yaw_rad": 0.08503616193876212,
+        "pitch_rad": -0.020770676657702016,
+        "fire_supported": false
+      },
+      "applied": {
+        "yaw_rad": 0.08503616193876212,
+        "pitch_rad": -0.020770676657628575,
+        "simulation_time_ns": 6510000000,
+        "fire_supported": false
+      },
+      "joint_stamp_ns": 6515000000,
+      "joints": {
+        "gimbal_yaw_joint": 0.08503616193876212,
+        "gimbal_pitch_joint": -0.020770676657628575
+      },
+      "tf_quaternion": [
+        0.00044142369041743815,
+        -0.01037576598618612,
+        0.0425029793323292,
+        0.9990423641533931
+      ]
+    },
+    "nodes": [
+      "autoaim_loop_observer",
+      "detector",
+      "p1sim_environment",
+      "rm_planner",
+      "rm_tracker",
+      "ros_gz_bridge",
+      "rosbag2_recorder",
+      "transform_listener_impl_59801d9c7ec0",
+      "transform_listener_impl_60c3d6a13320",
+      "transform_listener_impl_6107e0610040",
+      "virtual_serial"
+    ],
+    "required_nodes_alive": true,
+    "hardware_nodes_absent": true,
+    "pass": true
+  },
+  "bag_audit": {
+    "topic_counts": {
+      "/clock": 1652,
+      "/tf": 1634,
+      "/joint_states": 1633,
+      "/imu/data": 1633,
+      "/camera_info": 123,
+      "/tf_static": 1,
+      "/image_raw": 122,
+      "/armor_planner/cmd_gimbal": 1031,
+      "/detector/armors": 56,
+      "/tracker/target": 56,
+      "/p1sim/command_received": 163,
+      "/p1sim/gimbal_applied": 3
+    },
+    "positive_messages": {
+      "control": 163,
+      "fire": 84,
+      "armors": 10,
+      "tracking": 7
+    },
+    "exact_planner_receipts": 163,
+    "receipt_count": 163,
+    "applied": [
+      {
+        "yaw_rad": 0.08503616193876212,
+        "pitch_rad": -0.020770676657628575,
+        "simulation_time_ns": 6510000000,
+        "fire_supported": false
+      },
+      {
+        "yaw_rad": 0.08503616193876212,
+        "pitch_rad": -0.020770676657702016,
+        "simulation_time_ns": 6715000000,
+        "fire_supported": false
+      },
+      {
+        "yaw_rad": 0.08503616193876216,
+        "pitch_rad": -0.020770676657702002,
+        "simulation_time_ns": 6905000000,
+        "fire_supported": false
+      }
+    ],
+    "subsequent_joint_and_tf": true,
+    "camera_before_ns": 1455000000,
+    "camera_after_ns": 9505000000,
+    "camera_changed_pixels": 143429,
+    "fire_unsupported": true
+  },
+  "second_start": {
+    "source_time_tf": {
+      "sec": 4,
+      "nanosec": 490000000,
+      "frame": "camera_optical_frame",
+      "camera_info_sec": 4
+    },
+    "nonempty_armors": {
+      "count": 1,
+      "stamp_sec": 3
+    },
+    "tracking": {
+      "id": "three",
+      "stamp_sec": 4
+    },
+    "control": {
+      "yaw": 0.08503616193876215,
+      "pitch": -0.020770676658681365,
+      "fire": false
+    },
+    "loop_closure": {
+      "planner_receipt": {
+        "topic": "/armor_planner/cmd_gimbal",
+        "stamp_sec": 4,
+        "stamp_nanosec": 490000000,
+        "frame_id": "odom",
+        "control": true,
+        "fire_requested": false,
+        "yaw_rad": 0.08503616193876216,
+        "pitch_rad": -0.02077067665770201,
+        "fire_supported": false
+      },
+      "applied": {
+        "yaw_rad": 0.08503616193876212,
+        "pitch_rad": -0.02077067665748498,
+        "simulation_time_ns": 4510000000,
+        "fire_supported": false
+      },
+      "joint_stamp_ns": 4515000000,
+      "joints": {
+        "gimbal_yaw_joint": 0.08503616193876212,
+        "gimbal_pitch_joint": -0.02077067665748498
+      },
+      "tf_quaternion": [
+        0.0004414236904143864,
+        -0.010375765986114388,
+        0.042502979332329244,
+        0.9990423641533939
+      ]
+    },
+    "nodes": [
+      "autoaim_loop_observer",
+      "detector",
+      "p1sim_environment",
+      "rm_planner",
+      "rm_tracker",
+      "ros_gz_bridge",
+      "transform_listener_impl_5595f25c81b0",
+      "transform_listener_impl_583376065430",
+      "transform_listener_impl_649c1900f440",
+      "virtual_serial"
+    ],
+    "required_nodes_alive": true,
+    "hardware_nodes_absent": true,
+    "pass": true
+  },
+  "source_sha256": {
+    "p1sim": "f109f5e7a9a43114d64fe6217132a98c71961d589efe37a4be77eda87ae065a3",
+    "compose.yaml": "718a110cdeba47349253472d8e9da749bb2be969874d2fe9c67264c8566d1cf2",
+    "p1sim_dev/runtime.py": "3ba2c9eb256b67eaf04e77929b53e7f7edd284c8bfe7733019e0ceb096a710c5",
+    "worlds/developer.sdf": "64445685d73d854d74ea2b2428e7e63165ff641f611380ffd6d1a1eb1b2ca3be",
+    "examples/autoaim_check.py": "67a58f74d4f2c8c1c87076872acd373f778ebcd6c7804ce883c09f60e375d0ed"
+  },
+  "limitations": [
+    "Transient detection; sustained tracking not established",
+    "No physical, ballistic, scoring or hardware qualification"
+  ],
+  "runtime_builder": "Dockerfile.consumer with owner dependency image"
+}

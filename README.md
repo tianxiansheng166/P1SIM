@@ -68,11 +68,14 @@ algorithm nodes and remap their Image, CameraInfo and command topics as needed.
 Do not run a second TF authority for the same simulation frames.
 
 If the mounted workspace provides `rm_interfaces/msg/GimbalCmd`, the optional
-adapter subscribes to `/cmd_gimbal` (radian absolute yaw/pitch, enabled by
+adapter subscribes to `/armor_planner/cmd_gimbal` by default
+(configurable with `P1SIM_GIMBAL_TOPIC`) (radian absolute yaw/pitch, enabled by
 `control`). Set `P1SIM_WORKSPACE_SETUP` before `up` to load that ABI. `fire` is
 ignored: this development world has no weapon or projectile path. See
 [interfaces](docs/INTERFACES.md) before connecting a different stack version.
 The full private detector/tracker stack and proprietary weights are not bundled.
+See [real AutoAim integration](docs/AUTOAIM.md) for the external-camera launch,
+CPU runtime dependencies, recording and live loop observer.
 
 ## Commands and configuration
 
@@ -90,10 +93,13 @@ Optional environment variables:
 | `P1SIM_PROJECT` | `p1sim-dev` | Compose project name |
 | `P1SIM_USER_WORKSPACE` | bundled examples | User workspace mount |
 | `P1SIM_WORKSPACE_SETUP` | unset | Container path to user ROS setup |
+| `P1SIM_IMAGE` | `p1sim-developer:1.0.0` | Optional user dependency image extended with `Dockerfile.consumer` |
+| `P1SIM_GIMBAL_TOPIC` | `/armor_planner/cmd_gimbal` | Optional AutoAim command subscription, best effort |
+| `P1SIM_TRACKER_TOPIC` | `/tracker/target` | Optional target status and recording topic |
 
 Use a unique project, port, domain and state directory for each simultaneous
 instance. For repeatable comparisons, reset between runs and record your source
-revision, parameters and bags. V1 ships one static scene; it does not promise
+revision, parameters and bags. V1 ships one static scene with project-authored light-bar and digit targets; it does not promise
 bitwise deterministic sensor scheduling or a scoring framework.
 
 ## Troubleshooting

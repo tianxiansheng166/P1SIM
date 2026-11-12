@@ -37,9 +37,9 @@ def execute(command, interactive=False):
     if not interactive:
         command = ['python3', '-m', 'p1sim_dev.command', 'run', token] + command
     args = ['exec'] + ([] if interactive else ['-T']) + ['simulator', 'bash', '-lc',
-        'source /opt/ros/humble/setup.bash; '
+        'p1sim_command=("$@"); source /opt/ros/humble/setup.bash; '
         'if [ -n "$P1SIM_WORKSPACE_SETUP" ]; then source "$P1SIM_WORKSPACE_SETUP" || exit; fi; '
-        'exec "$@"', 'p1sim'] + command
+        'exec "${p1sim_command[@]}"', 'p1sim'] + command
     process = subprocess.Popen(COMPOSE + args, env=ENV)
     try:
         return process.wait()
@@ -105,7 +105,7 @@ def main():
             command = ['bash']
         if not command:
             parser.error('dev run requires a command after --')
-        return execute(command, interactive=sys.stdin.isatty())
+        return execute(command, interactive=action == 'shell' and sys.stdin.isatty())
     elif action == 'record':
         if len(opts.args) != 1 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}', opts.args[0]):
             parser.error('record requires one name (letters, digits, dot, underscore, dash)')

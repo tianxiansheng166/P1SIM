@@ -1,6 +1,6 @@
 services:
   simulator:
-    image: p1sim-developer:1.0.0
+    image: ${P1SIM_IMAGE:-p1sim-developer:1.0.0}
     build:
       context: .
       args:
@@ -16,6 +16,8 @@ services:
       IGN_PARTITION: p1sim-developer
       LIBGL_ALWAYS_SOFTWARE: '1'
       P1SIM_WORKSPACE_SETUP: ${P1SIM_WORKSPACE_SETUP:-}
+      P1SIM_GIMBAL_TOPIC: ${P1SIM_GIMBAL_TOPIC:-/armor_planner/cmd_gimbal}
+      P1SIM_TRACKER_TOPIC: ${P1SIM_TRACKER_TOPIC:-/tracker/target}
     volumes:
       - ${P1SIM_STATE_DIR:?state directory required}:/data
       - ${P1SIM_USER_WORKSPACE:-./examples}:/user_ws:ro

@@ -13,13 +13,16 @@ simulation time. Algorithms must enable `use_sim_time`. Clock restarts on reset.
 | `/joint_states` | `sensor_msgs/msg/JointState` | yaw/pitch in rad, reliable; kinematic applied command state |
 | `/imu/data` | `sensor_msgs/msg/Imu` | Orientation only, pitch_link, best effort; velocity/acceleration covariance -1 |
 | `/p1sim/gimbal_command` | `geometry_msgs/msg/Vector3` | x=yaw, y=pitch in rad; z reserved; absolute angles, reliable |
+| `/p1sim/gimbal_applied` | `std_msgs/msg/String` | JSON after Gazebo pose service succeeds; yaw/pitch rad and simulation time |
 | `/p1sim/command_received` | `std_msgs/msg/String` | JSON receipt; receipt does not prove physics application |
-| `/cmd_gimbal` | user `rm_interfaces/msg/GimbalCmd` | Optional ABI adapter: control gate, yaw/pitch rad; fire ignored |
+| `/armor_planner/cmd_gimbal` | user `rm_interfaces/msg/GimbalCmd` | Optional ABI adapter: configurable topic; best effort, control gate, yaw/pitch rad; fire ignored |
 
 Frames: `odom -> base_link -> yaw_link -> pitch_link -> camera_link ->
 camera_optical_frame`. Base is fixed; yaw axis +Z, pitch axis +Y, camera forward
 +X. Optical axes follow ROS (+Z forward, +X right, +Y down). Camera origin is
-(0,0,1) m relative to base. Positive pitch points camera down. If the user's
+(0,0,1) m relative to base. `odom` is at the initial gimbal pivot: the fixed
+`odom -> base_link` translation is (0,0,-1) m. This matches AutoAim's origin
+contract; the camera's Gazebo world elevation remains 1 m. Positive pitch points camera down. If the user's
 command convention differs, add an explicit conversion at that boundary;
 do not silently invert an algorithm command.
 
@@ -37,3 +40,14 @@ Readiness does not imply a private algorithm is present or correctly configured.
 The unchanged representative consumer is ROS `robot_state_publisher` through
 `examples/consumer.launch.py`; it subscribes directly to `/joint_states` and
 publishes distinct `consumer_*` frames. It does not replace the simulation TF.
+
+The optional AutoAim status includes discovered node names, received armors,
+nonempty armors, target/tracking counts, Planner/control counts, latest control
+and fire request, command receipts and applied-pose counts. Counters are cumulative;
+use callback ages and latest flags to distinguish past success from current tracking.
+The base `/health` readiness does not depend on the user algorithm. `fire` is
+only observed and recorded; there is no projectile or firing process.
+
+`dev record` also records `/detector/armors`, the configured tracker/Planner
+topics, and `/p1sim/gimbal_applied`. Unknown optional topics do not prevent
+recording the ordinary simulation topics. See [AutoAim integration](AUTOAIM.md).

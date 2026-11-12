@@ -35,3 +35,13 @@ claim is made.
 Installation fixes included readable source permissions for a non-root runtime
 and upgrading the complete installed rosbag2 package family together, avoiding
 CLI/Python/C++ ABI mixing inherited from the pinned base image.
+
+## Real AutoAim integration
+
+The later [AutoAim integration](AUTOAIM.md) additionally exercised the current
+private Detector/Tracker/Planner and `GimbalCmd` adapter using an owner's
+read-only workspace and dependency image. Two clean starts closed the software
+loop; a bag retained real algorithm output, receipts, applied state and sensors.
+This optional consumer test is separate from the public dependency-only base
+bootstrap above. Its private model assets are not distributed. Detection was
+transient; sustained tracking is not established.
