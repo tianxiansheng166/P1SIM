@@ -44,4 +44,5 @@ read-only workspace and dependency image. Two clean starts closed the software
 loop; a bag retained real algorithm output, receipts, applied state and sensors.
 This optional consumer test is separate from the public dependency-only base
 bootstrap above. Its private model assets are not distributed. Detection was
-transient; sustained tracking is not established.
+transient in T229. The subsequent [sustained profile](SUSTAINED_AUTOAIM.md)
+adds a real two-clean-start sustained-use check with unchanged algorithms.

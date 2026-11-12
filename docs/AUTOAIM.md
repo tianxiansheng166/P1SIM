@@ -113,7 +113,13 @@ Ctrl-C ends the launch; `./p1sim dev down` removes the container and its process
 Logs and bags remain in the state directory. Restart algorithms around `reset`,
 because the simulation clock jumps back to zero.
 
-## Observed result and limits
+## Sustained tracking profile
+
+Set `P1SIM_SCENE=autoaim` before `up` to use the single-target 90 degree
+developer view. See [sustained tracking](SUSTAINED_AUTOAIM.md) for profile
+geometry, live acquisition/gap diagnostics and real two-start evidence.
+
+## T229 observed result and limits
 
 [Compact observed messages and loop evidence](autoaim-observed.json) includes
 source and asset hashes, exact command receipt matching and the second start.

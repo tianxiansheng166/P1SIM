@@ -19,6 +19,7 @@ from sensor_msgs.msg import CameraInfo, Image, Imu, JointState
 from geometry_msgs.msg import TransformStamped, Vector3
 from std_msgs.msg import String
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
+from p1sim_dev.scene import Scene
 
 
 def quaternion(roll, pitch, yaw):
@@ -30,13 +31,17 @@ def quaternion(roll, pitch, yaw):
 
 
 class Environment(Node):
-    def __init__(self, children):
+    def __init__(self, children, scene):
         super().__init__('p1sim_environment', parameter_overrides=[rclpy.parameter.Parameter('use_sim_time', value=True)])
         self.children = children
+        self.scene = scene
+        self.sim_ns = 0
+        self.positive_stamps = {}
+        self.visibility = {}
         self.recorder = None
         self.record_log = None
         self.counts = dict(clock=0, image=0, camera_info=0, commands=0, applied=0,
-                           armors=0, nonempty_armors=0, targets=0, tracking=0, planner=0, control=0)
+                           armors=0, nonempty_armors=0, targets=0, tracking=0, planner=0, control=0, fire_ignored=0)
         self.autoaim_last = {}
         self.gimbal_topic = os.environ.get("P1SIM_GIMBAL_TOPIC", "/armor_planner/cmd_gimbal")
         self.tracker_topic = os.environ.get("P1SIM_TRACKER_TOPIC", "/tracker/target")
@@ -55,6 +60,7 @@ class Environment(Node):
         self.joint_pub = self.create_publisher(JointState, '/joint_states', 10)
         self.imu_pub = self.create_publisher(Imu, '/imu/data', qos_profile_sensor_data)
         self.ack_pub = self.create_publisher(String, '/p1sim/command_received', 10)
+        self.visibility_pub = self.create_publisher(String, '/p1sim/visibility', 10)
         self.applied_pub = self.create_publisher(String, '/p1sim/gimbal_applied', 10)
         self.create_subscription(Clock, '/clock', self.clock, qos_profile_sensor_data)
         self.create_subscription(Image, '/p1sim/raw_image', self.image, qos_profile_sensor_data)
@@ -88,6 +94,7 @@ class Environment(Node):
     def clock(self, msg):
         self.witness('clock')
         stamp = msg.clock
+        self.sim_ns = stamp.sec*10**9 + stamp.nanosec
         self.tf.sendTransform([
             self.transform('odom', 'base_link', stamp, (0, 0, -1), (0., 0., 0., 1.)),
             self.transform('base_link', 'yaw_link', stamp, (0, 0, 1), quaternion(0, 0, self.yaw)),
@@ -112,7 +119,7 @@ class Environment(Node):
         info = CameraInfo()
         info.header = msg.header
         info.width, info.height = msg.width, msg.height
-        focal = msg.width / (2 * math.tan(math.pi / 6))
+        focal = msg.width / (2 * math.tan(self.scene.fov / 2))
         info.distortion_model = 'plumb_bob'
         info.d = [0.] * 5
         info.k = [focal, 0., msg.width/2, 0., focal, msg.height/2, 0., 0., 1.]
@@ -121,18 +128,26 @@ class Environment(Node):
         self.info_pub.publish(info)
         self.witness('image')
         self.witness('camera_info')
+        self.visibility = dict(simulation_time_ns=msg.header.stamp.sec*10**9+msg.header.stamp.nanosec,
+            yaw_rad=self.yaw, pitch_rad=self.pitch, diagnostic_only=True,
+            targets=self.scene.project(msg.width, msg.height, self.yaw, self.pitch))
+        self.visibility_pub.publish(String(data=json.dumps(self.visibility)))
 
     def armors(self, msg):
         self.witness('armors')
         self.autoaim_last['armor_count'] = len(msg.armors)
         if msg.armors:
             self.witness('nonempty_armors')
+            self.positive_stamps['detection'] = msg.header.stamp.sec*10**9+msg.header.stamp.nanosec
+        self.autoaim_last['armor_ids'] = [a.number for a in msg.armors]
 
     def target(self, msg):
         self.witness('targets')
         self.autoaim_last['tracking'] = bool(msg.tracking)
         if msg.tracking:
             self.witness('tracking')
+            self.positive_stamps['tracking'] = msg.header.stamp.sec*10**9+msg.header.stamp.nanosec
+        self.autoaim_last['target_id'] = msg.id
 
     def autoaim_control(self, msg):
         self.witness('planner')
@@ -141,8 +156,11 @@ class Environment(Node):
                        control=bool(msg.control), fire_requested=bool(msg.fire),
                        yaw_rad=msg.yaw, pitch_rad=msg.pitch, fire_supported=False)
         self.autoaim_last['planner'] = receipt
+        if msg.fire:
+            self.witness('fire_ignored')
         if msg.control:
             self.witness('control')
+            self.positive_stamps['control'] = self.sim_ns
             command = Vector3(x=float(msg.yaw), y=float(msg.pitch), z=0.)
             self.control(command, receipt)
 
@@ -152,7 +170,9 @@ class Environment(Node):
             return
         self.command = (msg.x, msg.y)
         self.witness('commands')
-        self.ack_pub.publish(String(data=json.dumps(receipt or {'yaw_rad': msg.x, 'pitch_rad': msg.y, 'fire_supported': False})))
+        receipt = dict(receipt or {'yaw_rad': msg.x, 'pitch_rad': msg.y, 'fire_supported': False})
+        receipt.update(sequence=self.counts['commands'], simulation_time_ns=self.sim_ns)
+        self.ack_pub.publish(String(data=json.dumps(receipt)))
 
     def apply_command(self):
         if self.pose_pending is not None:
@@ -180,10 +200,19 @@ class Environment(Node):
             age = {key: round(time.monotonic()-value, 3) for key, value in self.last.items()}
             processes = {name: proc.poll() is None for name, proc in self.children.items()}
             ready = all(processes.values()) and all(age.get(key, 99) < 5 for key in ('clock', 'image', 'camera_info'))
-            return dict(ready=ready, processes=processes, messages=dict(self.counts), age_seconds=age,
+            gaps = {k: None if k not in self.positive_stamps else max(0, (self.sim_ns-self.positive_stamps[k])/1e9)
+                    for k in ('detection', 'tracking', 'control')}
+            fresh = {k: age.get(source, 99) < 2 and gaps[k] is not None and gaps[k] <= .5
+                     for k, source in (('detection', 'nonempty_armors'), ('tracking', 'tracking'), ('control', 'control'))}
+            fresh['detection'] &= self.autoaim_last.get('armor_count', 0) > 0
+            fresh['tracking'] &= self.autoaim_last.get('tracking', False)
+            fresh['control'] &= self.autoaim_last.get('planner', {}).get('control', False)
+            return dict(ready=ready, scene_profile=os.environ.get('P1SIM_SCENE', 'developer'), simulation_time_ns=self.sim_ns, processes=processes, messages=dict(self.counts), age_seconds=age,
                         gimbal_rad=dict(yaw=self.yaw, pitch=self.pitch), autoaim_adapter=self.autoaim_adapter,
                         autoaim=dict(command_topic=self.gimbal_topic, tracker_topic=self.tracker_topic,
-                                     nodes=sorted(self.get_node_names()), latest=dict(self.autoaim_last)),
+                                     nodes=sorted(self.get_node_names()), latest=dict(self.autoaim_last),
+                                     gap_age_sim_seconds=gaps, fresh=fresh,
+                                     visibility=self.visibility),
                         recording_directory='/data/bags', recording=self.recorder is not None and self.recorder.poll() is None, mode='developer')
 
 
@@ -199,7 +228,7 @@ class Environment(Node):
             self.record_log = open('/data/recording.log', 'a')
             self.recorder = subprocess.Popen(['ros2', 'bag', 'record', '--use-sim-time', '-o', str(output),
                 '/clock', '/image_raw', '/camera_info', '/tf', '/tf_static', '/joint_states',
-                '/imu/data', '/p1sim/gimbal_command', '/p1sim/command_received', '/p1sim/gimbal_applied',
+                '/imu/data', '/p1sim/visibility', '/p1sim/gimbal_command', '/p1sim/command_received', '/p1sim/gimbal_applied',
                 '/detector/armors', self.tracker_topic, self.gimbal_topic],
                 stdout=self.record_log, stderr=subprocess.STDOUT, start_new_session=True)
             return {'recording': name}
@@ -232,8 +261,8 @@ class View(BaseHTTPRequestHandler):
         else:
             payload = b'''<!doctype html><meta charset="utf-8"><title>P1SIM Live</title>
 <style>body{font:18px monospace;background:#15202b;color:#d8edff;margin:3em}pre{line-height:1.6}</style>
-<h1>P1SIM Developer Simulation</h1><p>Live ROS message flow and process health</p><pre id="state"></pre>
-<script>async function update(){try{state.textContent=JSON.stringify(await(await fetch('/status')).json(),null,2)}catch(e){state.textContent='Disconnected'}}update();setInterval(update,1000)</script>'''
+<h1>P1SIM Developer Simulation</h1><p id="loop">Waiting for live state</p><pre id="state"></pre>
+<script>async function update(){try{const s=await(await fetch('/status')).json();const a=s.autoaim;loop.textContent=['detection','tracking','control'].map(k=>k+': '+(a.fresh[k]?'ACTIVE':'WAIT / LOST')+' (gap '+(a.gap_age_sim_seconds[k]===null?'never':a.gap_age_sim_seconds[k].toFixed(2)+' sim s')+')').join(' | ');state.textContent=JSON.stringify(s,null,2)}catch(e){state.textContent='Disconnected'}}update();setInterval(update,1000)</script>'''
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
         self.end_headers()
@@ -274,8 +303,13 @@ def main():
     rclpy.init()
     node = None
     try:
+        profile = os.environ.get('P1SIM_SCENE', 'developer')
+        if profile not in ('developer', 'autoaim'):
+            raise ValueError('P1SIM_SCENE must be developer or autoaim')
+        world_path = '/opt/p1sim/worlds/' + profile + '.sdf'
+        scene = Scene(world_path)
         commands = {
-            'gazebo': ['ign', 'gazebo', '--headless-rendering', '-r', '-s', '/opt/p1sim/worlds/developer.sdf'],
+            'gazebo': ['ign', 'gazebo', '--headless-rendering', '-r', '-s', world_path],
             'ros_bridge': ['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
                 '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                 '/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
@@ -284,7 +318,7 @@ def main():
             log = open('/data/' + name + '.log', 'a', buffering=1)
             logs.append(log)
             children[name] = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-        node = Environment(children)
+        node = Environment(children, scene)
         View.environment = node
         server = ThreadingHTTPServer(('0.0.0.0', 8765), View)
         threading.Thread(target=server.serve_forever, daemon=True).start()

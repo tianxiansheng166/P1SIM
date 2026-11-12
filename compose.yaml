@@ -17,6 +17,7 @@ services:
       LIBGL_ALWAYS_SOFTWARE: '1'
       P1SIM_WORKSPACE_SETUP: ${P1SIM_WORKSPACE_SETUP:-}
       P1SIM_GIMBAL_TOPIC: ${P1SIM_GIMBAL_TOPIC:-/armor_planner/cmd_gimbal}
+      P1SIM_SCENE: ${P1SIM_SCENE:-developer}
       P1SIM_TRACKER_TOPIC: ${P1SIM_TRACKER_TOPIC:-/tracker/target}
     volumes:
       - ${P1SIM_STATE_DIR:?state directory required}:/data

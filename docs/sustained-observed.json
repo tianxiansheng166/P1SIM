@@ -1,0 +1,491 @@
+{
+  "task_id": "AA-P1SIM-T230",
+  "terminal": "P1SIM_AUTOAIM_SUSTAINED_TRACKING_DEVELOPER_READY",
+  "root_cause_class": "SIMULATOR_TARGET_PRESENTATION_RASTER_SCALE_VIEWPOINT_SENSITIVITY",
+  "source": {
+    "p1sim_base": "f1f6b8865987ed8f392873699bc30ba963df9bb1",
+    "pinyvision_consumer": "f380dde98d880fcd57d5e8f24dc0a76643fb6909",
+    "pinyvision_algorithm_base": "c37eca1057d6a78945ec3ee8c9840db837411340",
+    "algorithm_and_production_yaml_git_diff": "EMPTY",
+    "installed_production_yaml_exact_source_match": true,
+    "consumer_artifact_sha256": {
+      "lib/detector/detector_node": "d45d121894d27a4b1da252da28bcc91f116e89dfc66f86bea0d8e19b74a98e9b",
+      "lib/rm_tracker/rm_tracker_node": "128a8e0230f61ba8e309a2189dc471f647a1b37bd2e3b816f6ffcf26919912df",
+      "lib/rm_planner/rm_planner_node": "42af5592458241839aa3169a63b844d772d449a4fecec95dadc8b6fe9ac16f75",
+      "share/rm_vision_bringup/config/node_params.yaml": "4c42300930cdd7f51e121224fb2b8d455fe4f488c990d002fd9cecd15977d543",
+      "share/pinyvision_models/models/armor/0526.xml": "996c50dd1a52ffcbe6ff657bc98ff073e5545e2a232c3951e9002cadc471cdf0",
+      "share/pinyvision_models/models/armor/0526.bin": "5ad4c00119b957e345d9b0a591be2e42fd77baadade8fce87d4a7902b275d699"
+    }
+  },
+  "runtime": {
+    "image": "p1sim-autoaim:t230",
+    "image_id": "sha256:a46f269a95383ff50aede5ebe4726ada4f4c5cca930e064b4e6ba4b9a5563a9b",
+    "platform": "Ubuntu 22.04 / ROS Humble / OpenVINO 2023.3 CPU / Gazebo Fortress / Mesa headless",
+    "consumer_mount": "owner retained T229 installation, read-only",
+    "private_assets_redistributed": false
+  },
+  "scene_profile": {
+    "name": "autoaim",
+    "primary_target_world_m": [
+      2,
+      0.17,
+      1
+    ],
+    "horizontal_fov_deg": 90,
+    "image_px": [
+      640,
+      480
+    ],
+    "light_bar_mm": [
+      18,
+      55
+    ],
+    "core_width_mm": 4,
+    "kinematics_changed": false
+  },
+  "starts": [
+    {
+      "bag": "/data/bags/sustained-1",
+      "first_tracking_time": 5.285,
+      "required_window_seconds": 5.0,
+      "final_sim_time": 11.46,
+      "topic_counts": {
+        "/clock": 2005,
+        "/tf": 2005,
+        "/joint_states": 2005,
+        "/imu/data": 2005,
+        "/tf_static": 1,
+        "/camera_info": 152,
+        "/p1sim/visibility": 152,
+        "/image_raw": 149,
+        "/armor_planner/cmd_gimbal": 2364,
+        "/detector/armors": 99,
+        "/tracker/target": 99,
+        "/p1sim/command_received": 2236,
+        "/p1sim/gimbal_applied": 30
+      },
+      "fire_requests_ignored": 2177,
+      "positive_counts": {
+        "detection": 93,
+        "tracking": 93,
+        "control": 2251
+      },
+      "receipt_sequence_complete": true,
+      "receipts": 2236,
+      "exact_receipts": 2236,
+      "receipt_fire_unsupported": true,
+      "every_application_joint_tf": true,
+      "sustained_window": [
+        5.285,
+        10.285
+      ],
+      "max_gap_sim_seconds": {
+        "detection": 0.2649999999999997,
+        "tracking": 0.13000000000000078,
+        "control": 0.019999999999999574
+      },
+      "visibility_samples": 76,
+      "fully_in_fov": true,
+      "rendered_target_interior": true,
+      "command_induced_image_changes": 24,
+      "window_image_samples": 74,
+      "pass": true,
+      "first_nonempty_armor_time": 4.885,
+      "application_count": 30,
+      "loop_closure": {
+        "source_time_tf": {
+          "sec": 5,
+          "nanosec": 480000000,
+          "frame": "camera_optical_frame",
+          "camera_info_sec": 5
+        },
+        "nonempty_armors": {
+          "count": 1,
+          "stamp_sec": 4
+        },
+        "tracking": {
+          "id": "three",
+          "stamp_sec": 5
+        },
+        "control": {
+          "yaw": 0.08505931973121096,
+          "pitch": -0.020645792372716475,
+          "fire": false
+        },
+        "loop_closure": {
+          "planner_receipt": {
+            "topic": "/armor_planner/cmd_gimbal",
+            "stamp_sec": 5,
+            "stamp_nanosec": 480000000,
+            "frame_id": "odom",
+            "control": true,
+            "fire_requested": false,
+            "yaw_rad": 0.08505931973121096,
+            "pitch_rad": -0.020645792371743004,
+            "fire_supported": false,
+            "sequence": 74,
+            "simulation_time_ns": 5500000000
+          },
+          "applied": {
+            "yaw_rad": 0.08505931973121096,
+            "pitch_rad": -0.02064579237167001,
+            "simulation_time_ns": 5500000000,
+            "fire_supported": false
+          },
+          "joint_stamp_ns": 5505000000,
+          "joints": {
+            "gimbal_yaw_joint": 0.08505931973121096,
+            "gimbal_pitch_joint": -0.02064579237167001
+          },
+          "tf_quaternion": [
+            0.0004388891300153288,
+            -0.010313378538693834,
+            0.04251457462539846,
+            0.9990425178859359
+          ]
+        },
+        "nodes": [
+          "autoaim_loop_observer",
+          "detector",
+          "p1sim_environment",
+          "rm_planner",
+          "rm_tracker",
+          "ros_gz_bridge",
+          "rosbag2_recorder",
+          "transform_listener_impl_5645d01853a0",
+          "transform_listener_impl_5a03dbab89a0",
+          "transform_listener_impl_5f3c9e5df4a0",
+          "virtual_serial"
+        ],
+        "required_nodes_alive": true,
+        "hardware_nodes_absent": true,
+        "pass": true
+      },
+      "bag_local_path": "/home/tian/code/artifacts/aa_p1sim_t230/final/bags/sustained-1",
+      "bag_manifest": {
+        "sustained-1_0.db3": {
+          "sha256": "bcdcdb9bf60f358009d4ed5d994430c49f5ef01ce47265078ac2bddd15a7216c",
+          "bytes": 140763136
+        },
+        "metadata.yaml": {
+          "sha256": "206b30e7b5f6690faa745e6102b48a701b26ab556a133917c5eeb938a5405b07",
+          "bytes": 6740
+        }
+      },
+      "bag_retention": "RETAINED_EXACT"
+    },
+    {
+      "bag": "/data/bags/sustained-2",
+      "first_tracking_time": 5.35,
+      "required_window_seconds": 5.0,
+      "final_sim_time": 11.725,
+      "topic_counts": {
+        "/clock": 2058,
+        "/tf": 2047,
+        "/joint_states": 2046,
+        "/imu/data": 2046,
+        "/tf_static": 1,
+        "/camera_info": 154,
+        "/p1sim/visibility": 154,
+        "/image_raw": 153,
+        "/armor_planner/cmd_gimbal": 2437,
+        "/detector/armors": 99,
+        "/tracker/target": 99,
+        "/p1sim/command_received": 2294,
+        "/p1sim/gimbal_applied": 31
+      },
+      "fire_requests_ignored": 2227,
+      "positive_counts": {
+        "detection": 96,
+        "tracking": 93,
+        "control": 2307
+      },
+      "receipt_sequence_complete": true,
+      "receipts": 2294,
+      "exact_receipts": 2294,
+      "receipt_fire_unsupported": true,
+      "every_application_joint_tf": true,
+      "sustained_window": [
+        5.35,
+        10.35
+      ],
+      "max_gap_sim_seconds": {
+        "detection": 0.2649999999999988,
+        "tracking": 0.13500000000000156,
+        "control": 0.025000000000000355
+      },
+      "visibility_samples": 76,
+      "fully_in_fov": true,
+      "rendered_target_interior": true,
+      "command_induced_image_changes": 24,
+      "window_image_samples": 76,
+      "pass": true,
+      "first_nonempty_armor_time": 4.955,
+      "application_count": 31,
+      "loop_closure": {
+        "source_time_tf": {
+          "sec": 5,
+          "nanosec": 545000000,
+          "frame": "camera_optical_frame",
+          "camera_info_sec": 5
+        },
+        "nonempty_armors": {
+          "count": 1,
+          "stamp_sec": 4
+        },
+        "tracking": {
+          "id": "three",
+          "stamp_sec": 5
+        },
+        "control": {
+          "yaw": 0.08505931973121096,
+          "pitch": -0.020645792372716475,
+          "fire": false
+        },
+        "loop_closure": {
+          "planner_receipt": {
+            "topic": "/armor_planner/cmd_gimbal",
+            "stamp_sec": 5,
+            "stamp_nanosec": 545000000,
+            "frame_id": "odom",
+            "control": true,
+            "fire_requested": false,
+            "yaw_rad": 0.08505931973121096,
+            "pitch_rad": -0.020645792371743004,
+            "fire_supported": false,
+            "sequence": 80,
+            "simulation_time_ns": 5595000000
+          },
+          "applied": {
+            "yaw_rad": 0.08505931973121096,
+            "pitch_rad": -0.02064579237167001,
+            "simulation_time_ns": 5595000000,
+            "fire_supported": false
+          },
+          "joint_stamp_ns": 5600000000,
+          "joints": {
+            "gimbal_yaw_joint": 0.08505931973121096,
+            "gimbal_pitch_joint": -0.02064579237167001
+          },
+          "tf_quaternion": [
+            0.0004388891300153288,
+            -0.010313378538693834,
+            0.04251457462539846,
+            0.9990425178859359
+          ]
+        },
+        "nodes": [
+          "autoaim_loop_observer",
+          "detector",
+          "p1sim_environment",
+          "rm_planner",
+          "rm_tracker",
+          "ros_gz_bridge",
+          "rosbag2_recorder",
+          "transform_listener_impl_5ca331f74ae0",
+          "transform_listener_impl_5eb62294bea0",
+          "transform_listener_impl_5f55fcd51ba0",
+          "virtual_serial"
+        ],
+        "required_nodes_alive": true,
+        "hardware_nodes_absent": true,
+        "pass": true
+      },
+      "bag_local_path": "/home/tian/code/artifacts/aa_p1sim_t230/final/bags/sustained-2",
+      "bag_manifest": {
+        "sustained-2_0.db3": {
+          "sha256": "a49f533bfd9d065957e4d65653f0db9ef857489787ad740959f3029c8140a917",
+          "bytes": 144543744
+        },
+        "metadata.yaml": {
+          "sha256": "03ce13d5589e4f0aaef921b8906f24bc37fb95577ab430f89d6be311e73fd428",
+          "bytes": 6740
+        }
+      },
+      "bag_retention": "RETAINED_EXACT"
+    }
+  ],
+  "longer_observation": {
+    "bag": "/data/bags/sustained-1",
+    "first_tracking_time": 5.215,
+    "required_window_seconds": 30.0,
+    "final_sim_time": 36.355,
+    "topic_counts": {
+      "/clock": 6994,
+      "/tf": 6985,
+      "/joint_states": 6985,
+      "/imu/data": 6985,
+      "/camera_info": 529,
+      "/p1sim/visibility": 529,
+      "/tf_static": 1,
+      "/image_raw": 525,
+      "/armor_planner/cmd_gimbal": 11533,
+      "/detector/armors": 472,
+      "/tracker/target": 472,
+      "/p1sim/command_received": 11410,
+      "/p1sim/gimbal_applied": 156
+    },
+    "fire_requests_ignored": 11348,
+    "positive_counts": {
+      "detection": 443,
+      "tracking": 466,
+      "control": 11424
+    },
+    "receipt_sequence_complete": true,
+    "receipts": 11410,
+    "exact_receipts": 11410,
+    "receipt_fire_unsupported": true,
+    "every_application_joint_tf": true,
+    "sustained_window": [
+      5.215,
+      35.215
+    ],
+    "max_gap_sim_seconds": {
+      "detection": 0.33000000000000185,
+      "tracking": 0.13500000000000156,
+      "control": 0.020000000000000462
+    },
+    "visibility_samples": 454,
+    "fully_in_fov": true,
+    "rendered_target_interior": true,
+    "command_induced_image_changes": 151,
+    "window_image_samples": 452,
+    "pass": true,
+    "first_nonempty_armor_time": 4.82,
+    "application_count": 156,
+    "loop_closure": {
+      "source_time_tf": {
+        "sec": 5,
+        "nanosec": 415000000,
+        "frame": "camera_optical_frame",
+        "camera_info_sec": 5
+      },
+      "nonempty_armors": {
+        "count": 1,
+        "stamp_sec": 4
+      },
+      "tracking": {
+        "id": "three",
+        "stamp_sec": 5
+      },
+      "control": {
+        "yaw": 0.08505931973121096,
+        "pitch": -0.020645792372716475,
+        "fire": false
+      },
+      "loop_closure": {
+        "planner_receipt": {
+          "topic": "/armor_planner/cmd_gimbal",
+          "stamp_sec": 5,
+          "stamp_nanosec": 415000000,
+          "frame_id": "odom",
+          "control": true,
+          "fire_requested": false,
+          "yaw_rad": 0.08505931973121096,
+          "pitch_rad": -0.020645792371743004,
+          "fire_supported": false,
+          "sequence": 76,
+          "simulation_time_ns": 5445000000
+        },
+        "applied": {
+          "yaw_rad": 0.08505931973121096,
+          "pitch_rad": -0.020645792371724755,
+          "simulation_time_ns": 5445000000,
+          "fire_supported": false
+        },
+        "joint_stamp_ns": 5450000000,
+        "joints": {
+          "gimbal_yaw_joint": 0.08505931973121096,
+          "gimbal_pitch_joint": -0.020645792371724755
+        },
+        "tf_quaternion": [
+          0.0004388891300164924,
+          -0.010313378538721177,
+          0.042514574625398455,
+          0.9990425178859357
+        ]
+      },
+      "nodes": [
+        "autoaim_loop_observer",
+        "detector",
+        "p1sim_environment",
+        "rm_planner",
+        "rm_tracker",
+        "ros_gz_bridge",
+        "rosbag2_recorder",
+        "transform_listener_impl_589500067d70",
+        "transform_listener_impl_5b28cab51550",
+        "transform_listener_impl_5f6f44609020",
+        "virtual_serial"
+      ],
+      "required_nodes_alive": true,
+      "hardware_nodes_absent": true,
+      "pass": true
+    },
+    "bag_local_path": "/home/tian/code/artifacts/aa_p1sim_t230/long/bags/sustained-1",
+    "bag_manifest": {
+      "metadata.yaml": {
+        "sha256": "1ce288a9371b9202b66134b7d4b80fc8e6547470cae1cd468f2671f7317ec413",
+        "bytes": 6745
+      },
+      "sustained-1_0.db3.gz": {
+        "sha256": "69b0a5e82f03ffa7365de2846da13366bf863f25568f0a513fc3d56bcabc7419",
+        "bytes": 11357413
+      }
+    },
+    "bag_retention": "ARCHIVED_EXACT_GZIP; restore DB3 with gzip -dk before ros2 bag read"
+  },
+  "generic_regression": {
+    "passed": true,
+    "checks": [
+      "doctor",
+      "up",
+      "source-time TF",
+      "real robot_state_publisher launch",
+      "Ctrl-C cleanup",
+      "record",
+      "reset",
+      "down",
+      "second-up",
+      "final down"
+    ]
+  },
+  "browser": {
+    "real_chromium": true,
+    "banner": "detection: ACTIVE (gap 0.04 sim s) | tracking: ACTIVE (gap 0.04 sim s) | control: ACTIVE (gap 0.00 sim s)",
+    "screenshot": "sustained-visuals/live-status.png"
+  },
+  "tested_source_sha256": {
+    "p1sim": "f109f5e7a9a43114d64fe6217132a98c71961d589efe37a4be77eda87ae065a3",
+    "compose.yaml": "171ca6a31a71a06eac0c0c5b27e0eb993f4ec00021ac299b9ec6483fa9c4c02d",
+    "p1sim_dev/runtime.py": "7c0fa291054b064be0ec1d9c2cb1c89c50c295290b437db008f62e8e6c71bbc2",
+    "p1sim_dev/scene.py": "ee9b973158dc6ce962fed0f96b61cabdf8af2990fcacd8e30f3c41b2f1820e42",
+    "examples/autoaim_check.py": "67a58f74d4f2c8c1c87076872acd373f778ebcd6c7804ce883c09f60e375d0ed",
+    "examples/autoaim_bag_check.py": "462dddf9c2bdb8b0ef09bf38bdeb2ca37e002352c6df9f135158e21866e257d0",
+    "worlds/developer.sdf": "64445685d73d854d74ea2b2428e7e63165ff641f611380ffd6d1a1eb1b2ca3be",
+    "worlds/autoaim.sdf": "61952cd871f8998313f84d4011b9e067f8c312f7929a3db8297e3f042b1e2c0d",
+    "tests/sustained_acceptance.py": "b9b8c6a6c41351f176cfb5374bf741d129edda91041291d29429f3395247d621"
+  },
+  "reuse": {
+    "decision": "ADAPT",
+    "source": "T229 exact base observer plus task-owned bag audit",
+    "reason": "extend existing software-loop evidence with gap ages and visibility; no scientific score"
+  },
+  "resource_exit": {
+    "task_containers": 0,
+    "task_networks": 0,
+    "consumer_processes": 0,
+    "retired_allocated_bytes": 2389200896,
+    "archive_logical_bytes_saved": 587678716,
+    "current_runtime_image_retained": true,
+    "foreign_assets_deleted": false
+  },
+  "limitations": [
+    "Developer usability only for this fixed source/model/profile pair",
+    "Not detector robustness, actuator/ballistic fidelity, scorer validity, hardware readiness or scientific Provider qualification",
+    "Private model is the owner-installed T229 0526 pair; identity with inaccessible private model submodule is not asserted",
+    "Kinematic service completion, rendering and TF are asynchronous; a transition image can differ from confirmed-pose projection"
+  ],
+  "next_product_gap": "Moving-target, occlusion and broader scale/view robustness remain unqualified; current accepted profile is static and single-target",
+  "policy_note": "Target product checkout has no AGENTS.md/V2.2 marker; routed via Task Card 17/17A and Commander-pinned a4f6bcfe policy; no policy edits"
+}

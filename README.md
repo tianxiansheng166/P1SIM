@@ -75,7 +75,8 @@ ignored: this development world has no weapon or projectile path. See
 [interfaces](docs/INTERFACES.md) before connecting a different stack version.
 The full private detector/tracker stack and proprietary weights are not bundled.
 See [real AutoAim integration](docs/AUTOAIM.md) for the external-camera launch,
-CPU runtime dependencies, recording and live loop observer.
+CPU runtime dependencies, recording and live loop observer. Use the
+[sustained AutoAim scene](docs/SUSTAINED_AUTOAIM.md) for continuous tracking sessions.
 
 ## Commands and configuration
 
@@ -95,11 +96,12 @@ Optional environment variables:
 | `P1SIM_WORKSPACE_SETUP` | unset | Container path to user ROS setup |
 | `P1SIM_IMAGE` | `p1sim-developer:1.0.0` | Optional user dependency image extended with `Dockerfile.consumer` |
 | `P1SIM_GIMBAL_TOPIC` | `/armor_planner/cmd_gimbal` | Optional AutoAim command subscription, best effort |
+| `P1SIM_SCENE` | `developer` | Generic scene; `autoaim` selects the sustained single-target wide-view profile |
 | `P1SIM_TRACKER_TOPIC` | `/tracker/target` | Optional target status and recording topic |
 
 Use a unique project, port, domain and state directory for each simultaneous
 instance. For repeatable comparisons, reset between runs and record your source
-revision, parameters and bags. V1 ships one static scene with project-authored light-bar and digit targets; it does not promise
+revision, parameters and bags. V1 ships static generic and single-target AutoAim scenes with project-authored light-bar and digit targets; it does not promise
 bitwise deterministic sensor scheduling or a scoring framework.
 
 ## Troubleshooting

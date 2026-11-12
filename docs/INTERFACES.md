@@ -7,14 +7,15 @@ simulation time. Algorithms must enable `use_sim_time`. Clock restarts on reset.
 |---|---|---|
 | `/clock` | `rosgraph_msgs/msg/Clock` | Gazebo clock, one bridge publisher |
 | `/image_raw` | `sensor_msgs/msg/Image` | 640x480 RGB, 15 Hz requested, optical frame, best effort |
-| `/camera_info` | `sensor_msgs/msg/CameraInfo` | Same image stamp, ideal pinhole, 60 degree horizontal FOV, zero distortion, best effort |
+| `/camera_info` | `sensor_msgs/msg/CameraInfo` | Same image stamp, ideal pinhole, 60 degree generic / 90 degree AutoAim horizontal FOV, zero distortion, best effort |
 | `/tf` | `tf2_msgs/msg/TFMessage` | Simulation clock stamps, reliable |
 | `/tf_static` | `tf2_msgs/msg/TFMessage` | Camera optical convention, transient local |
 | `/joint_states` | `sensor_msgs/msg/JointState` | yaw/pitch in rad, reliable; kinematic applied command state |
 | `/imu/data` | `sensor_msgs/msg/Imu` | Orientation only, pitch_link, best effort; velocity/acceleration covariance -1 |
 | `/p1sim/gimbal_command` | `geometry_msgs/msg/Vector3` | x=yaw, y=pitch in rad; z reserved; absolute angles, reliable |
+| `/p1sim/visibility` | `std_msgs/msg/String` | Read-only developer projection from scene geometry, image stamp and confirmed camera angles; never an algorithm input |
 | `/p1sim/gimbal_applied` | `std_msgs/msg/String` | JSON after Gazebo pose service succeeds; yaw/pitch rad and simulation time |
-| `/p1sim/command_received` | `std_msgs/msg/String` | JSON receipt; receipt does not prove physics application |
+| `/p1sim/command_received` | `std_msgs/msg/String` | JSON receipt with monotonic consumed-command sequence and consumption simulation time; receipt does not prove physics application |
 | `/armor_planner/cmd_gimbal` | user `rm_interfaces/msg/GimbalCmd` | Optional ABI adapter: configurable topic; best effort, control gate, yaw/pitch rad; fire ignored |
 
 Frames: `odom -> base_link -> yaw_link -> pitch_link -> camera_link ->
@@ -51,3 +52,9 @@ only observed and recorded; there is no projectile or firing process.
 `dev record` also records `/detector/armors`, the configured tracker/Planner
 topics, and `/p1sim/gimbal_applied`. Unknown optional topics do not prevent
 recording the ordinary simulation topics. See [AutoAim integration](AUTOAIM.md).
+
+The sustained AutoAim profile adds current freshness flags and
+`autoaim.gap_age_sim_seconds` (detection, tracking, control; null before first
+positive), armor/target IDs and `messages.fire_ignored`. Wall-clock callback
+ages remain separate. `dev record` also captures `/p1sim/visibility`. See
+[SUSTAINED_AUTOAIM.md](SUSTAINED_AUTOAIM.md) for timing and projection limits.
