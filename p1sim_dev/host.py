@@ -13,13 +13,61 @@ from p1sim_dev.config import load, digest, atomic_json, FOUNDATION_VERSION
 
 
 def source_identity(root):
-    tracked = subprocess.check_output(['git', '-C', str(root), 'ls-files', '--cached', '--others', '--exclude-standard', '-z']).decode().split('\0')
-    checksums = {name: hashlib.sha256((root/name).read_bytes()).hexdigest()
-                 for name in tracked if name and name != 'SHA256SUMS' and (root/name).is_file()}
+    root = Path(root).resolve()
+    # A GitHub Release source tarball deliberately contains no .git directory.
+    # For that deployment, bind the same identity to a fully verified,
+    # immutable SHA256SUMS manifest. Never invent a Git commit SHA.
+    git_checkout = (root/'.git').exists()
+    if git_checkout:
+        tracked = subprocess.check_output(
+            ['git', '-C', str(root), 'ls-files', '--cached', '--others',
+             '--exclude-standard', '-z']).decode().split('\0')
+        checksums = {name: hashlib.sha256((root/name).read_bytes()).hexdigest()
+                     for name in tracked if name and name != 'SHA256SUMS' and (root/name).is_file()}
+        git_sha = subprocess.check_output(
+            ['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+        dirty = bool(subprocess.check_output(
+            ['git', '-C', str(root), 'status', '--porcelain'], text=True).strip())
+        identity_source = 'GIT_CHECKOUT'
+    else:
+        manifest = root/'SHA256SUMS'
+        if not manifest.is_file():
+            raise ValueError('SOURCE_ARCHIVE_SHA256SUMS_REQUIRED')
+        checksums = {}
+        for line in manifest.read_text().splitlines():
+            if len(line) < 67 or line[64:66] != '  ':
+                raise ValueError('SOURCE_ARCHIVE_MANIFEST_INVALID')
+            expected, name = line[:64], line[66:]
+            rel = Path(name)
+            if (not all(c in '0123456789abcdef' for c in expected) or
+                not name or rel.is_absolute() or '..' in rel.parts or
+                name in checksums or name == 'SHA256SUMS'):
+                raise ValueError('SOURCE_ARCHIVE_MANIFEST_INVALID')
+            path = root/rel
+            if not path.is_file() or path.is_symlink():
+                raise ValueError('SOURCE_ARCHIVE_MISSING_FILE:'+name)
+            actual = hashlib.sha256(path.read_bytes()).hexdigest()
+            if actual != expected:
+                raise ValueError('SOURCE_ARCHIVE_CHECKSUM_MISMATCH:'+name)
+            checksums[name] = actual
+        required = ('release.json','p1sim','Dockerfile','compose.yaml',
+                    'p1sim_dev/host.py')
+        if any(name not in checksums for name in required):
+            raise ValueError('SOURCE_ARCHIVE_MANIFEST_INCOMPLETE')
+        for folder in ('p1sim_dev','worlds'):
+            for path in (root/folder).rglob('*'):
+                if (path.is_file() and '__pycache__' not in path.parts and
+                    path.suffix != '.pyc' and
+                    path.relative_to(root).as_posix() not in checksums):
+                    raise ValueError('SOURCE_ARCHIVE_UNLISTED_RUNTIME_FILE')
+        git_sha = None
+        dirty = False
+        identity_source = 'VERIFIED_RELEASE_ARCHIVE'
     runtime_checksums = {name: sha for name, sha in checksums.items() if name.startswith(('p1sim_dev/', 'worlds/')) or name == 'release.json'}
-    return dict(runtime_checksums=runtime_checksums, git_sha=subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip(),
-        dirty=bool(subprocess.check_output(['git', '-C', str(root), 'status', '--porcelain'], text=True).strip()),
-        content_digest=digest(checksums), release=json.loads((root/'release.json').read_text()))
+    return dict(runtime_checksums=runtime_checksums, git_sha=git_sha,
+        dirty=dirty, identity_source=identity_source,
+        content_digest=digest(checksums),
+        release=json.loads((root/'release.json').read_text()))
 
 
 def prepare(root, state, config):

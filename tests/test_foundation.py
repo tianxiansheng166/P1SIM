@@ -8,12 +8,36 @@ from p1sim_dev.config import normalize, digest
 from p1sim_dev.plugins import Registry, Context
 from p1sim_dev.builtins import Trajectory, KinematicGimbal
 from p1sim_dev.host import prepare
+from p1sim_dev.host import source_identity
 from p1sim_dev.foundation import Foundation
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class FoundationTest(unittest.TestCase):
+    def test_release_archive_identity_without_git_and_tamper_rejection(self):
+        # Mirrors a Release tarball extraction, which has no .git directory.
+        from shutil import copyfile
+        import hashlib
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            paths = ('release.json', 'p1sim', 'Dockerfile', 'compose.yaml',
+                     'p1sim_dev/host.py')
+            for name in paths:
+                (root/name).parent.mkdir(parents=True, exist_ok=True)
+                copyfile(ROOT/name,root/name)
+            (root/'SHA256SUMS').write_text(''.join(
+                hashlib.sha256((root/name).read_bytes()).hexdigest()+'  '+name+'\n'
+                for name in paths))
+            result = source_identity(root)
+            self.assertIsNone(result['git_sha'])
+            self.assertFalse(result['dirty'])
+            self.assertEqual(result['identity_source'],'VERIFIED_RELEASE_ARCHIVE')
+            self.assertTrue(result['content_digest'])
+            (root/'release.json').write_text('{}')
+            with self.assertRaisesRegex(ValueError,'SOURCE_ARCHIVE_CHECKSUM_MISMATCH'):
+                source_identity(root)
+
     def test_config_canonical_and_fail_fast(self):
         a = normalize({'seed': 12})
         self.assertEqual(digest(a), digest(normalize(json.loads(json.dumps(a)))))
