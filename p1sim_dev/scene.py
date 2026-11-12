@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 class Scene:
     def __init__(self, path):
         world = ET.parse(path).getroot().find('world')
+        self.world_name = world.get('name')
         camera = world.find("model[@name='camera']")
         self.camera_position = tuple(map(float, camera.findtext('pose').split()[:3]))
         self.fov = float(camera.findtext('link/sensor/camera/horizontal_fov'))

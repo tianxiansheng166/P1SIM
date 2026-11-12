@@ -20,6 +20,8 @@ from geometry_msgs.msg import TransformStamped, Vector3
 from std_msgs.msg import String
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 from p1sim_dev.scene import Scene
+from p1sim_dev.foundation import Foundation
+from p1sim_dev.config import atomic_json
 
 
 def quaternion(roll, pitch, yaw):
@@ -31,10 +33,27 @@ def quaternion(roll, pitch, yaw):
 
 
 class Environment(Node):
-    def __init__(self, children, scene):
+    def __init__(self, children, scene, foundation):
         super().__init__('p1sim_environment', parameter_overrides=[rclpy.parameter.Parameter('use_sim_time', value=True)])
         self.children = children
         self.scene = scene
+        self.foundation = foundation
+        self.registry = foundation.registry
+        self.config = foundation.config
+        self.sensor_queue = []
+        self.sensor_effect = {}
+        self.gimbal_model = self.registry['gimbal'].step(0.)
+        self.applied_velocity = [0., 0.]
+        self.last_application_ns = 0
+        self.target_pending = None
+        self.target_applied_request = None
+        self.target_states = {}
+        self.initial_targets = list(scene.targets)
+        self.next_target_update = 0
+        self.target_index = 0
+        self.foundation_pub = self.create_publisher(String, '/p1sim/state', 10)
+        self.target_pub = self.create_publisher(String, '/p1sim/target_state', 10)
+        self.camera_timing_pub = self.create_publisher(String, '/p1sim/camera_timing', 10)
         self.sim_ns = 0
         self.positive_stamps = {}
         self.visibility = {}
@@ -51,20 +70,21 @@ class Environment(Node):
         self.pose_pending = None
         self.pose_applied = None
         self.lock = threading.RLock()
+        self.create_timer(0.5, self.publish_foundation, clock=rclpy.clock.Clock())
         self.tf = TransformBroadcaster(self)
         self.static_tf = StaticTransformBroadcaster(self)
         optical = self.transform('camera_link', 'camera_optical_frame', 0, (0, 0, 0), quaternion(-math.pi/2, 0, -math.pi/2))
         self.static_tf.sendTransform(optical)
-        self.image_pub = self.create_publisher(Image, '/image_raw', qos_profile_sensor_data)
-        self.info_pub = self.create_publisher(CameraInfo, '/camera_info', qos_profile_sensor_data)
-        self.joint_pub = self.create_publisher(JointState, '/joint_states', 10)
-        self.imu_pub = self.create_publisher(Imu, '/imu/data', qos_profile_sensor_data)
+        self.image_pub = self.create_publisher(Image, self.topic('image', '/image_raw'), qos_profile_sensor_data)
+        self.info_pub = self.create_publisher(CameraInfo, self.topic('camera_info', '/camera_info'), qos_profile_sensor_data)
+        self.joint_pub = self.create_publisher(JointState, self.topic('joint_states', '/joint_states'), 10)
+        self.imu_pub = self.create_publisher(Imu, self.topic('imu', '/imu/data'), qos_profile_sensor_data)
         self.ack_pub = self.create_publisher(String, '/p1sim/command_received', 10)
         self.visibility_pub = self.create_publisher(String, '/p1sim/visibility', 10)
         self.applied_pub = self.create_publisher(String, '/p1sim/gimbal_applied', 10)
         self.create_subscription(Clock, '/clock', self.clock, qos_profile_sensor_data)
         self.create_subscription(Image, '/p1sim/raw_image', self.image, qos_profile_sensor_data)
-        self.create_subscription(Vector3, '/p1sim/gimbal_command', self.control, 10)
+        self.create_subscription(Vector3, self.topic('gimbal_command', '/p1sim/gimbal_command'), self.control, 10)
         # Optional ABI adapter uses the user's own mounted interface package.
         try:
             from rm_interfaces.msg import GimbalCmd, Armors, Target
@@ -76,6 +96,35 @@ class Environment(Node):
             self.create_subscription(Target, self.tracker_topic, self.target, qos_profile_sensor_data)
             self.autoaim_adapter = True
         self.create_timer(0.02, self.apply_command, clock=rclpy.clock.Clock())
+
+    def topic(self, name, default):
+        return self.config['topics'].get(name, '/'+self.config['namespace'].strip('/')+default if self.config['namespace'] else default)
+
+    def publish_foundation(self):
+        if self.foundation.phase == 'RESETTING':
+            return
+        status = self.status()
+        if status['ready'] and self.foundation.phase == 'STARTING':
+            self.foundation.event('READY')
+        value = self.foundation.observable('state', state=self.foundation.phase,
+            simulation_time_ns=self.sim_ns, plugins=self.registry.identities,
+            gimbal_model=self.gimbal_model, gimbal_applied=dict(q_rad=[self.yaw,self.pitch], v_rad_s=self.applied_velocity),
+            targets=self.target_states, sensor_effect=self.sensor_effect)
+        self.foundation_pub.publish(String(data=json.dumps(value)))
+        self.target_pub.publish(String(data=json.dumps(self.foundation.observable('target_state',
+            simulation_time_ns=self.sim_ns, targets=self.target_states))))
+        atomic_json(Path('/data/status.json'), value)
+
+    def prepare_reset(self):
+        with self.lock:
+            if self.foundation.phase == 'RESETTING':
+                raise ValueError('Reset already pending')
+            self.foundation.event('RESETTING')
+            self.foundation_pub.publish(String(data=json.dumps(self.foundation.observable('lifecycle', state='RESETTING'))))
+            envelope = dict(self.foundation.envelope)
+            envelope['epoch'] += 1
+            atomic_json(Path('/data/run.json'), envelope)
+            return dict(next_epoch=envelope['epoch'], state='RESETTING', clock_behavior='restart_at_zero_per_epoch')
 
     def transform(self, parent, child, stamp, xyz, q):
         msg = TransformStamped()
@@ -95,6 +144,12 @@ class Environment(Node):
         self.witness('clock')
         stamp = msg.clock
         self.sim_ns = stamp.sec*10**9 + stamp.nanosec
+        self.foundation.simulation_ns = self.sim_ns
+        if self.foundation.phase == 'RESETTING':
+            return
+        self.gimbal_model = self.registry['gimbal'].step(self.sim_ns/1e9)
+        self.update_targets()
+        self.flush_images()
         self.tf.sendTransform([
             self.transform('odom', 'base_link', stamp, (0, 0, -1), (0., 0., 0., 1.)),
             self.transform('base_link', 'yaw_link', stamp, (0, 0, 1), quaternion(0, 0, self.yaw)),
@@ -104,6 +159,7 @@ class Environment(Node):
         joint.header.stamp = stamp
         joint.name = ['gimbal_yaw_joint', 'gimbal_pitch_joint']
         joint.position = [self.yaw, self.pitch]
+        joint.velocity = list(self.applied_velocity)
         self.joint_pub.publish(joint)
         imu = Imu()
         imu.header.stamp, imu.header.frame_id = stamp, 'pitch_link'
@@ -114,12 +170,35 @@ class Environment(Node):
         self.imu_pub.publish(imu)
 
     def image(self, msg):
+        if self.foundation.phase == 'RESETTING':
+            return
+        source_ns = msg.header.stamp.sec*10**9+msg.header.stamp.nanosec
+        effect = self.registry['sensor'].process(source_ns/1e9, msg)
+        delay = self.registry['timing'].delay(source_ns/1e9)
+        self.sensor_effect = {k: v for k, v in effect.items() if k != 'image'}
+        self.sensor_effect['delay_seconds'] = delay
+        if not effect['dropped']:
+            if len(self.sensor_queue) >= 256:
+                raise RuntimeError('Sensor delay queue exceeded 256 frames')
+            self.sensor_queue.append((source_ns+int(delay*1e9), source_ns, effect, delay))
+            self.flush_images()
+
+    def flush_images(self):
+        # Preserve source order and source stamps even when jitter reorders due times.
+        while self.sensor_queue and self.sensor_queue[0][0] <= self.sim_ns:
+            _, source_ns, effect, delay = self.sensor_queue.pop(0)
+            self.publish_image(effect['image'], effect)
+            self.camera_timing_pub.publish(String(data=json.dumps(self.foundation.observable('camera_timing',
+                source_time_ns=source_ns, delivery_time_ns=self.sim_ns, delay_seconds=delay,
+                frame_id='camera_optical_frame', occluded=effect['occluded']))))
+
+    def publish_image(self, msg, effect):
         msg.header.frame_id = 'camera_optical_frame'
         self.image_pub.publish(msg)
         info = CameraInfo()
         info.header = msg.header
         info.width, info.height = msg.width, msg.height
-        focal = msg.width / (2 * math.tan(self.scene.fov / 2))
+        focal = msg.width / (2 * math.tan(self.scene.fov / 2))*effect['calibration_scale']
         info.distortion_model = 'plumb_bob'
         info.d = [0.] * 5
         info.k = [focal, 0., msg.width/2, 0., focal, msg.height/2, 0., 0., 1.]
@@ -128,7 +207,7 @@ class Environment(Node):
         self.info_pub.publish(info)
         self.witness('image')
         self.witness('camera_info')
-        self.visibility = dict(simulation_time_ns=msg.header.stamp.sec*10**9+msg.header.stamp.nanosec,
+        self.visibility = self.foundation.observable('visibility', occluded=effect['occluded'], simulation_time_ns=msg.header.stamp.sec*10**9+msg.header.stamp.nanosec,
             yaw_rad=self.yaw, pitch_rad=self.pitch, diagnostic_only=True,
             targets=self.scene.project(msg.width, msg.height, self.yaw, self.pitch))
         self.visibility_pub.publish(String(data=json.dumps(self.visibility)))
@@ -171,6 +250,8 @@ class Environment(Node):
         self.command = (msg.x, msg.y)
         self.witness('commands')
         receipt = dict(receipt or {'yaw_rad': msg.x, 'pitch_rad': msg.y, 'fire_supported': False})
+        self.registry['gimbal'].submit(self.command, self.sim_ns, self.counts['commands'])
+        receipt.update(self.foundation.observable('command_received'))
         receipt.update(sequence=self.counts['commands'], simulation_time_ns=self.sim_ns)
         self.ack_pub.publish(String(data=json.dumps(receipt)))
 
@@ -180,26 +261,69 @@ class Environment(Node):
                 return
             output, _ = self.pose_pending.communicate()
             if self.pose_pending.returncode == 0 and 'data: true' in output:
-                self.yaw, self.pitch = self.pose_applied
+                previous = [self.yaw, self.pitch]
+                self.yaw, self.pitch = self.pose_applied['q_rad']
+                elapsed = (self.sim_ns-self.last_application_ns)/1e9
+                self.applied_velocity = [(q-p)/elapsed if elapsed > 0 else 0. for q,p in zip([self.yaw,self.pitch],previous)]
+                self.last_application_ns = self.sim_ns
                 self.witness("applied")
-                self.applied_pub.publish(String(data=json.dumps(dict(yaw_rad=self.yaw, pitch_rad=self.pitch,
-                    simulation_time_ns=self.get_clock().now().nanoseconds, fire_supported=False))))
+                self.applied_pub.publish(String(data=json.dumps(self.foundation.observable('gimbal_applied', yaw_rad=self.yaw, pitch_rad=self.pitch,
+                    v_rad_s=self.applied_velocity, command_sequence=self.pose_applied['command_sequence'],
+                    receipt_time_ns=self.pose_applied['receipt_time_ns'], application_time_ns=self.sim_ns,
+                    simulation_time_ns=self.sim_ns, fire_supported=False))))
+            else:
+                raise RuntimeError('Gazebo gimbal pose application failed')
             self.pose_pending = None
-        if self.command is None or self.command == (self.yaw, self.pitch):
+        if self.foundation.phase == 'RESETTING' or self.command is None or tuple(self.gimbal_model['q_rad']) == (self.yaw, self.pitch):
             return
-        yaw, pitch = self.command
+        yaw, pitch = self.gimbal_model['q_rad']
         x, y, z, w = quaternion(0, pitch, yaw)
         request = f'name: "camera", position: {{x: 0, y: 0, z: 1}}, orientation: {{x:{x}, y:{y}, z:{z}, w:{w}}}'
-        self.pose_applied = self.command
-        self.pose_pending = subprocess.Popen(['ign', 'service', '-s', '/world/developer/set_pose',
+        self.pose_applied = dict(self.gimbal_model)
+        self.pose_pending = subprocess.Popen(['ign', 'service', '-s', f'/world/{self.scene.world_name}/set_pose',
             '--reqtype', 'ignition.msgs.Pose', '--reptype', 'ignition.msgs.Boolean', '--timeout', '1000',
             '--req', request], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    def update_targets(self):
+        if self.target_pending is not None:
+            if self.target_pending.poll() is None:
+                return
+            output, _ = self.target_pending.communicate()
+            if self.target_pending.returncode != 0 or 'data: true' not in output:
+                raise RuntimeError('Gazebo target pose application failed')
+            name, state, pose = self.target_applied_request
+            self.target_states[name].update(applied=state, application_time_ns=self.sim_ns)
+            self.scene.targets = [(n, pose if n == name else p, size) for n,p,size in self.scene.targets]
+            self.target_pub.publish(String(data=json.dumps(self.foundation.observable('target_state',
+                simulation_time_ns=self.sim_ns, targets=self.target_states))))
+            self.target_pending = None
+        if not self.initial_targets or self.sim_ns < self.next_target_update:
+            return
+        self.next_target_update = self.sim_ns+100000000
+        name, initial, _ = self.initial_targets[self.target_index % len(self.initial_targets)]
+        self.target_index += 1
+        state = dict(self.registry['target'].state(self.sim_ns/1e9, initial), source_time_ns=self.sim_ns)
+        self.target_states.setdefault(name, {})['requested'] = state
+        pose = tuple(state['position_m']+state['rpy_rad'])
+        current = next(p for n,p,_ in self.scene.targets if n == name)
+        if pose == current:
+            self.target_states[name].update(applied=state, application_time_ns=self.sim_ns)
+            return
+        x,y,z = state['position_m']
+        qx,qy,qz,qw = quaternion(*state['rpy_rad'])
+        request = f'name: "{name}", position: {{x:{x}, y:{y}, z:{z}}}, orientation: {{x:{qx}, y:{qy}, z:{qz}, w:{qw}}}'
+        self.target_applied_request = (name, state, pose)
+        self.target_pending = subprocess.Popen(['ign','service','-s',f'/world/{self.scene.world_name}/set_pose',
+            '--reqtype','ignition.msgs.Pose','--reptype','ignition.msgs.Boolean','--timeout','1000','--req',request],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     def status(self):
         with self.lock:
             age = {key: round(time.monotonic()-value, 3) for key, value in self.last.items()}
             processes = {name: proc.poll() is None for name, proc in self.children.items()}
-            ready = all(processes.values()) and all(age.get(key, 99) < 5 for key in ('clock', 'image', 'camera_info'))
+            ready = self.foundation.phase != 'RESETTING' and all(processes.values()) and all(age.get(key, 99) < 5 for key in ('clock', 'image', 'camera_info'))
+            if ready and self.foundation.phase == 'STARTING':
+                self.foundation.event('READY')
             gaps = {k: None if k not in self.positive_stamps else max(0, (self.sim_ns-self.positive_stamps[k])/1e9)
                     for k in ('detection', 'tracking', 'control')}
             fresh = {k: age.get(source, 99) < 2 and gaps[k] is not None and gaps[k] <= .5
@@ -207,7 +331,8 @@ class Environment(Node):
             fresh['detection'] &= self.autoaim_last.get('armor_count', 0) > 0
             fresh['tracking'] &= self.autoaim_last.get('tracking', False)
             fresh['control'] &= self.autoaim_last.get('planner', {}).get('control', False)
-            return dict(ready=ready, scene_profile=os.environ.get('P1SIM_SCENE', 'developer'), simulation_time_ns=self.sim_ns, processes=processes, messages=dict(self.counts), age_seconds=age,
+            return dict(foundation=self.foundation.observable('state', state=self.foundation.phase, plugins=self.registry.identities,
+                        gimbal_model=self.gimbal_model, applied_velocity_rad_s=self.applied_velocity, targets=self.target_states, sensor_effect=self.sensor_effect), ready=ready, scene_profile=os.environ.get('P1SIM_SCENE', 'developer'), simulation_time_ns=self.sim_ns, processes=processes, messages=dict(self.counts), age_seconds=age,
                         gimbal_rad=dict(yaw=self.yaw, pitch=self.pitch), autoaim_adapter=self.autoaim_adapter,
                         autoaim=dict(command_topic=self.gimbal_topic, tracker_topic=self.tracker_topic,
                                      nodes=sorted(self.get_node_names()), latest=dict(self.autoaim_last),
@@ -227,8 +352,9 @@ class Environment(Node):
                 raise ValueError('Recording already exists; choose a new name')
             self.record_log = open('/data/recording.log', 'a')
             self.recorder = subprocess.Popen(['ros2', 'bag', 'record', '--use-sim-time', '-o', str(output),
-                '/clock', '/image_raw', '/camera_info', '/tf', '/tf_static', '/joint_states',
-                '/imu/data', '/p1sim/visibility', '/p1sim/gimbal_command', '/p1sim/command_received', '/p1sim/gimbal_applied',
+                '/clock', self.topic('image','/image_raw'), self.topic('camera_info','/camera_info'), '/tf', '/tf_static', self.topic('joint_states','/joint_states'),
+                '/p1sim/state', '/p1sim/target_state', '/p1sim/camera_timing',
+                self.topic('imu','/imu/data'), '/p1sim/visibility', self.topic('gimbal_command','/p1sim/gimbal_command'), '/p1sim/command_received', '/p1sim/gimbal_applied',
                 '/detector/armors', self.tracker_topic, self.gimbal_topic],
                 stdout=self.record_log, stderr=subprocess.STDOUT, start_new_session=True)
             return {'recording': name}
@@ -278,6 +404,8 @@ class View(BaseHTTPRequestHandler):
                 raise ValueError('Expected JSON object')
             if self.path == '/record/start':
                 result = self.environment.start_record(payload.get('name'))
+            elif self.path == '/reset/prepare':
+                result = self.environment.prepare_reset()
             elif self.path == '/record/stop':
                 result = self.environment.stop_record()
             else:
@@ -302,14 +430,15 @@ def main():
     logs = []
     rclpy.init()
     node = None
+    foundation = None
+    server = None
     try:
-        profile = os.environ.get('P1SIM_SCENE', 'developer')
-        if profile not in ('developer', 'autoaim'):
-            raise ValueError('P1SIM_SCENE must be developer or autoaim')
-        world_path = '/opt/p1sim/worlds/' + profile + '.sdf'
+        foundation = Foundation()
+        profile = foundation.config['scene']
+        world_path = foundation.registry['world'].resolve(profile, '/opt/p1sim')
         scene = Scene(world_path)
         commands = {
-            'gazebo': ['ign', 'gazebo', '--headless-rendering', '-r', '-s', world_path],
+            'gazebo': ['ign', 'gazebo'] + (['--headless-rendering', '-r', '-s'] if foundation.config['headless'] else ['-r']) + [world_path],
             'ros_bridge': ['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
                 '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                 '/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
@@ -318,7 +447,7 @@ def main():
             log = open('/data/' + name + '.log', 'a', buffering=1)
             logs.append(log)
             children[name] = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
-        node = Environment(children, scene)
+        node = Environment(children, scene, foundation)
         View.environment = node
         server = ThreadingHTTPServer(('0.0.0.0', 8765), View)
         threading.Thread(target=server.serve_forever, daemon=True).start()
@@ -327,6 +456,12 @@ def main():
     except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
         pass
     finally:
+        if server:
+            server.shutdown()
+            server.server_close()
+        if node and node.target_pending and node.target_pending.poll() is None:
+            node.target_pending.terminate()
+            node.target_pending.wait(timeout=3)
         if node and node.recorder is not None:
             node.stop_record()
         if node and node.pose_pending and node.pose_pending.poll() is None:
@@ -343,6 +478,8 @@ def main():
                 proc.wait()
         for log in logs:
             log.close()
+        if foundation:
+            foundation.close()
         if node:
             node.destroy_node()
         rclpy.try_shutdown()

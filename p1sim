@@ -58,9 +58,12 @@ def main():
     parser = argparse.ArgumentParser(description='P1SIM developer simulation')
     parser.add_argument('mode', choices=['dev'])
     parser.add_argument('action', choices=['bootstrap', 'doctor', 'up', 'status', 'shell',
-                                         'run', 'record', 'logs', 'reset', 'down'])
+                                         'run', 'record', 'logs', 'reset', 'down', 'batch'])
     parser.add_argument('args', nargs=argparse.REMAINDER)
     opts = parser.parse_args()
+    if opts.action == 'batch':
+        from p1sim_dev.host import batch
+        return batch(ROOT, opts.args)
     STATE.mkdir(parents=True, exist_ok=True)
     action = opts.action
     if action == 'bootstrap':
@@ -78,8 +81,29 @@ def main():
             return result.returncode
         print('Ready for local simulation (ROS 2 Humble, Gazebo Fortress, software rendering).')
     elif action == 'up':
+        from p1sim_dev.config import load
+        from p1sim_dev.host import prepare, configure_env
+        config_path = None
+        if opts.args:
+            up_parser = argparse.ArgumentParser()
+            up_parser.add_argument('--config', required=True)
+            config_path = up_parser.parse_args(opts.args).config
+        existing = compose('ps', '-q', capture=True).stdout.strip()
+        if config_path and existing:
+            raise ValueError('Run down before selecting a new config')
+        if config_path or not (STATE/'run.json').exists() or (not existing and ENV.get('P1SIM_PREPARED') != '1' and not (STATE/'reset-pending').exists()):
+            config = load(config_path)
+            if not config_path:
+                config['scene'] = ENV.get('P1SIM_SCENE', 'developer')
+                config['workspace']['setup'] = ENV.get('P1SIM_WORKSPACE_SETUP', '')
+                config['workspace']['path'] = ENV.get('P1SIM_USER_WORKSPACE', '')
+            prepare(ROOT, STATE, config)
+        else:
+            config = json.loads((STATE/'run.json').read_text())['config']
+        (STATE/'reset-pending').unlink(missing_ok=True)
+        configure_env(ENV, config)
         compose('up', '-d')
-        deadline = time.monotonic() + 120
+        deadline = time.monotonic() + config['ready_timeout_seconds']
         while time.monotonic() < deadline:
             try:
                 status = endpoint('health')
@@ -124,6 +148,8 @@ def main():
     elif action == 'logs':
         compose('logs', '--tail', '100')
     elif action == 'reset':
+        endpoint('reset/prepare', {})
+        (STATE/'reset-pending').touch()
         compose('restart', 'simulator')
         return subprocess.call([str(ROOT / 'p1sim'), 'dev', 'up'], env=ENV)
     elif action == 'down':

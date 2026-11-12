@@ -1,4 +1,4 @@
-# P1SIM Developer Edition
+# P1SIM Foundation Edition
 
 A local ROS 2 / Gazebo environment for developing algorithms. Start the world,
 launch your own ROS software, observe sensors, record a bag, and stop.
@@ -127,3 +127,24 @@ provenance and scorer qualification are separate opt-in workflows; no such
 qualification is claimed for this basic world. The gimbal adapter is kinematic,
 not a calibrated actuator model. The scene contains project-authored geometric
 objects, not competition meshes or proprietary detector assets.
+
+
+## Foundation V1 configuration and batch
+
+Foundation V1 adds seeded, versioned run configuration, observable reset epochs,
+headless one-shot runs and loadable target/gimbal/sensor/timing/world models.
+Existing Developer commands and topics retain interface version 1.
+
+```bash
+./p1sim dev up --config configs/extensions.json
+./p1sim dev status
+./p1sim dev reset
+./p1sim dev down
+./p1sim dev batch --config configs/extensions.json --seed 42 --output ./my-run
+```
+
+See [Foundation contract and plugin API](docs/FOUNDATION.md),
+[compatibility manifest](compatibility.json) and the
+[external serial caller](examples/batch_caller.py).
+Use `configs/autoaim.json` with your local workspace path to attach the unchanged
+real PinyVision consumer through the same versioned configuration surface.

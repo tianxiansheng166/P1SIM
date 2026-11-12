@@ -43,8 +43,9 @@ def status():
 
 try:
     STATE.mkdir(parents=True, exist_ok=True)
-    for index in (1, 2):
-        run('up')
+    windows = [float(w) for w in os.environ.get('P1SIM_WINDOWS', ','.join([os.environ.get('P1SIM_WINDOW', '5')]*int(os.environ.get('P1SIM_STARTS', '2')))).split(',')]
+    for index, window in enumerate(windows, 1):
+        run('up', *(['--config', os.environ['P1SIM_CONFIG']] if os.environ.get('P1SIM_CONFIG') else []))
         recorder = start(f'record-{index}', ['record', f'sustained-{index}'])
         time.sleep(2)
         observer = start(f'observer-{index}', ['run', '--', 'python3', '/opt/p1sim/examples/autoaim_check.py',
@@ -53,13 +54,13 @@ try:
         consumer = start(f'consumer-{index}', ['run', '--', 'ros2', 'launch', 'rm_vision_bringup',
                          'vision_bringup.launch.py', 'camera:=external', 'inference_device:=CPU'])
         first_tracking = None
-        deadline = time.monotonic()+50
+        deadline = time.monotonic()+max(90, window*15)
         while time.monotonic() < deadline:
             time.sleep(.25)
             current = status()
             if current['autoaim']['latest'].get('tracking') and first_tracking is None:
                 first_tracking = current['simulation_time_ns']/1e9
-            if first_tracking is not None and current['simulation_time_ns']/1e9 >= first_tracking+6:
+            if first_tracking is not None and current['simulation_time_ns']/1e9 >= first_tracking+window+1:
                 break
         else:
             raise RuntimeError(f'No sustained observation window on start {index}')
@@ -70,7 +71,7 @@ try:
         if observer.returncode:
             raise RuntimeError('Real loop observer failed')
         run('run', '--', 'python3', '-m', 'examples.autoaim_bag_check', f'/data/bags/sustained-{index}',
-            '--output', f'/data/sustained-{index}.json')
+            '--window', str(window), '--output', f'/data/sustained-{index}.json')
         stop(consumer)
         time.sleep(2)
         graph = run('run', '--', 'ros2', 'node', 'list')

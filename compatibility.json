@@ -1,0 +1,56 @@
+{
+  "foundation_version": "1.0.0",
+  "release_candidate": "1.0.0-rc.1",
+  "interface_version": 1,
+  "plugin_api_version": 1,
+  "config_version": 1,
+  "observable_schema_version": 1,
+  "additive_policy": "Ignore unknown optional observable keys; preserve existing fields, units, QoS, frames, clocks and defaults",
+  "breaking_policy": "Requires Foundation V2 plus affected interface/config/plugin API major",
+  "deprecation_policy": "Release notes and explicit migration supported across at least one minor release",
+  "config_migration": "No implicit V1 migration; explicit future migration preserves original and changes digest",
+  "public_commands": [
+    "bootstrap",
+    "doctor",
+    "up",
+    "status",
+    "shell",
+    "run",
+    "record",
+    "logs",
+    "reset",
+    "down",
+    "batch"
+  ],
+  "standard_topics": {
+    "/clock": "rosgraph_msgs/msg/Clock",
+    "/image_raw": "sensor_msgs/msg/Image",
+    "/camera_info": "sensor_msgs/msg/CameraInfo",
+    "/tf": "tf2_msgs/msg/TFMessage",
+    "/tf_static": "tf2_msgs/msg/TFMessage",
+    "/joint_states": "sensor_msgs/msg/JointState",
+    "/imu/data": "sensor_msgs/msg/Imu",
+    "/p1sim/gimbal_command": "geometry_msgs/msg/Vector3"
+  },
+  "observable_schemas": [
+    "p1sim.state",
+    "p1sim.lifecycle",
+    "p1sim.target_state",
+    "p1sim.camera_timing",
+    "p1sim.visibility",
+    "p1sim.command_received",
+    "p1sim.gimbal_applied",
+    "p1sim.batch_result"
+  ],
+  "identity_fields": [
+    "run_id",
+    "run_key",
+    "foundation_version",
+    "interface_version",
+    "plugin_api_version",
+    "config_digest",
+    "seed",
+    "epoch",
+    "source"
+  ]
+}

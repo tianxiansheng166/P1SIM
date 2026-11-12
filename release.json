@@ -1,6 +1,6 @@
 {
-  "product": "P1SIM Developer Edition",
-  "version": "1.0.0",
+  "product": "P1SIM Foundation",
+  "version": "1.0.0-rc.1",
   "ros_distro": "humble",
   "gazebo": "fortress",
   "interface_version": 1,
@@ -10,5 +10,8 @@
   "runtime_build": "Dockerfile; apt package revisions resolved at build time",
   "source_checksums": "SHA256SUMS",
   "license": "MIT",
-  "scientific_qualification_claimed": false
+  "scientific_qualification_claimed": false,
+  "foundation_version": "1.0.0",
+  "plugin_api_version": 1,
+  "config_version": 1
 }

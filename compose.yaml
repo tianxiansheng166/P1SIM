@@ -1,6 +1,6 @@
 services:
   simulator:
-    image: ${P1SIM_IMAGE:-p1sim-developer:1.0.0}
+    image: ${P1SIM_IMAGE:-p1sim-foundation:1.0.0-rc.1}
     build:
       context: .
       args:
@@ -13,7 +13,7 @@ services:
       HOME: /tmp/p1sim-home
       ROS_DOMAIN_ID: ${P1SIM_ROS_DOMAIN_ID:-88}
       ROS_LOCALHOST_ONLY: '0'
-      IGN_PARTITION: p1sim-developer
+      IGN_PARTITION: ${P1SIM_PROJECT:-p1sim-dev}
       LIBGL_ALWAYS_SOFTWARE: '1'
       P1SIM_WORKSPACE_SETUP: ${P1SIM_WORKSPACE_SETUP:-}
       P1SIM_GIMBAL_TOPIC: ${P1SIM_GIMBAL_TOPIC:-/armor_planner/cmd_gimbal}

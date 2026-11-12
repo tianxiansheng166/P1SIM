@@ -1,0 +1,9 @@
+{
+  "config_version": 1,
+  "foundation_version": "1.0.0",
+  "interface_version": 1,
+  "plugin_api_version": 1,
+  "seed": 0,
+  "duration_seconds": 2,
+  "headless": true
+}
