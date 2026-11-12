@@ -73,7 +73,21 @@ def batch(root, args):
                   run_key=run['run_key'], exit_status='FAILED', clean_teardown=False)
     log = (output/'batch.log').open('w')
     def call(*command):
-        subprocess.run(cli+list(command), env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
+        process = subprocess.Popen(cli+list(command), env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+        try:
+            code = process.wait()
+        except BaseException:
+            for signum, timeout in ((signal.SIGINT, 10), (signal.SIGTERM, 5), (signal.SIGKILL, 2)):
+                if process.poll() is not None:
+                    break
+                os.killpg(process.pid, signum)
+                try:
+                    process.wait(timeout=timeout)
+                except subprocess.TimeoutExpired:
+                    continue
+            raise
+        if code:
+            raise subprocess.CalledProcessError(code, cli+list(command))
     previous_handler = signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(KeyboardInterrupt()))
     try:
         call('up')

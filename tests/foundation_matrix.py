@@ -77,5 +77,21 @@ finally:
     if p.poll() is None:
         p.terminate();p.wait(timeout=40)
 results['external_stop']=dict(passed=True,result=json.loads((OUTPUT/'external-stop'/'result.json').read_text()))
+p=subprocess.Popen(CLI+['--config',str(path),'--stop-file',str(OUTPUT/'never-stop'),'--output',str(OUTPUT/'interrupted')],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+try:
+    deadline=time.monotonic()+15
+    while not (OUTPUT/'interrupted'/'runtime'/'run.json').exists() and time.monotonic()<deadline:
+        assert p.poll() is None
+        time.sleep(.02)
+    assert (OUTPUT/'interrupted'/'runtime'/'run.json').exists()
+    time.sleep(.5)
+    p.terminate()
+    stdout,stderr=p.communicate(timeout=50)
+    result=json.loads((OUTPUT/'interrupted'/'result.json').read_text())
+    assert p.returncode!=0 and result['exit_status']=='INTERRUPTED' and result['clean_teardown'],(stdout,stderr,result)
+finally:
+    if p.poll() is None:
+        p.terminate();p.wait(timeout=50)
+results['interrupted_startup']=dict(passed=True,result=result)
 (OUTPUT/'matrix-result.json').write_text(json.dumps(dict(passed=True,cases=results),indent=2)+'\n')
 print(json.dumps(dict(passed=True,cases=list(results))))
