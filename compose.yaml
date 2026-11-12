@@ -1,0 +1,30 @@
+services:
+  simulator:
+    image: p1sim-developer:1.0.0
+    build:
+      context: .
+      args:
+        UBUNTU_MIRROR: ${P1SIM_UBUNTU_MIRROR:-http://archive.ubuntu.com/ubuntu}
+        ROS_MIRROR: ${P1SIM_ROS_MIRROR:-http://packages.ros.org/ros2/ubuntu}
+    command: [bash, -c, 'if [ -n "$$P1SIM_WORKSPACE_SETUP" ]; then source "$$P1SIM_WORKSPACE_SETUP" || exit; fi; exec python3 -m p1sim_dev.runtime']
+    user: '${P1SIM_UID:-1000}:${P1SIM_GID:-1000}'
+    init: true
+    environment:
+      HOME: /tmp/p1sim-home
+      ROS_DOMAIN_ID: ${P1SIM_ROS_DOMAIN_ID:-88}
+      ROS_LOCALHOST_ONLY: '0'
+      IGN_PARTITION: p1sim-developer
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      P1SIM_WORKSPACE_SETUP: ${P1SIM_WORKSPACE_SETUP:-}
+    volumes:
+      - ${P1SIM_STATE_DIR:?state directory required}:/data
+      - ${P1SIM_USER_WORKSPACE:-./examples}:/user_ws:ro
+    ports:
+      - '127.0.0.1:${P1SIM_STATUS_PORT:-8765}:8765'
+    shm_size: 512mb
+    stop_grace_period: 20s
+    healthcheck:
+      test: ['CMD', 'python3', '-c', "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 18

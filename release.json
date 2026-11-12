@@ -1,0 +1,14 @@
+{
+  "product": "P1SIM Developer Edition",
+  "version": "1.0.0",
+  "ros_distro": "humble",
+  "gazebo": "fortress",
+  "interface_version": 1,
+  "host": "Linux x86_64 with Docker Engine and Compose v2",
+  "rendering": "Mesa CPU headless",
+  "base_image": "ros:humble-ros-base@sha256:1813d3c85d7f96ff7d3012d865204583255740182db5d0065f8f8cd029a83138",
+  "runtime_build": "Dockerfile; apt package revisions resolved at build time",
+  "source_checksums": "SHA256SUMS",
+  "license": "MIT",
+  "scientific_qualification_claimed": false
+}

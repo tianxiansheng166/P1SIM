@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""Dependency-free host CLI for the P1SIM developer environment."""
+import argparse
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+import urllib.request
+import uuid
+
+ROOT = Path(__file__).resolve().parent
+STATE = Path(os.environ.get('P1SIM_STATE_DIR', '~/.local/state/p1sim-developer')).expanduser().resolve()
+ENV = dict(os.environ, P1SIM_STATE_DIR=str(STATE), P1SIM_UID=str(os.getuid()), P1SIM_GID=str(os.getgid()))
+PROJECT = os.environ.get('P1SIM_PROJECT', 'p1sim-dev')
+COMPOSE = ['docker', 'compose', '-p', PROJECT, '-f', str(ROOT / 'compose.yaml')]
+
+
+def compose(*args, check=True, capture=False):
+    return subprocess.run(COMPOSE + list(args), env=ENV, check=check,
+                          text=True, capture_output=capture)
+
+
+def endpoint(path='status', payload=None):
+    port = ENV.get('P1SIM_STATUS_PORT', '8765')
+    request = urllib.request.Request(f'http://127.0.0.1:{port}/{path}',
+        data=json.dumps(payload).encode() if payload is not None else None,
+        headers={'Content-Type': 'application/json'})
+    with urllib.request.urlopen(request, timeout=15) as reply:
+        return json.load(reply)
+
+
+def execute(command, interactive=False):
+    token = uuid.uuid4().hex
+    if not interactive:
+        command = ['python3', '-m', 'p1sim_dev.command', 'run', token] + command
+    args = ['exec'] + ([] if interactive else ['-T']) + ['simulator', 'bash', '-lc',
+        'source /opt/ros/humble/setup.bash; '
+        'if [ -n "$P1SIM_WORKSPACE_SETUP" ]; then source "$P1SIM_WORKSPACE_SETUP" || exit; fi; '
+        'exec "$@"', 'p1sim'] + command
+    process = subprocess.Popen(COMPOSE + args, env=ENV)
+    try:
+        return process.wait()
+    except KeyboardInterrupt:
+        if not interactive:
+            compose('exec', '-T', 'simulator', 'python3', '-m', 'p1sim_dev.command', 'stop', token, check=False)
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.terminate()
+            process.wait(timeout=5)
+        return 130
+
+
+def main():
+    parser = argparse.ArgumentParser(description='P1SIM developer simulation')
+    parser.add_argument('mode', choices=['dev'])
+    parser.add_argument('action', choices=['bootstrap', 'doctor', 'up', 'status', 'shell',
+                                         'run', 'record', 'logs', 'reset', 'down'])
+    parser.add_argument('args', nargs=argparse.REMAINDER)
+    opts = parser.parse_args()
+    STATE.mkdir(parents=True, exist_ok=True)
+    action = opts.action
+    if action == 'bootstrap':
+        compose('build', '--pull')
+        print('Bootstrap complete. Run: ./p1sim dev doctor')
+    elif action == 'doctor':
+        compose('version')
+        subprocess.run(['docker', 'info', '--format', '{{.OSType}}/{{.Architecture}}'], check=True)
+        result = compose('run', '--rm', '--no-deps', 'simulator', 'bash', '-lc',
+            'source /opt/ros/humble/setup.bash && ign gazebo --versions && '
+            'ros2 pkg prefix ros_gz_bridge && python3 -c "import rclpy, tf2_ros, rosbag2_py"',
+            check=False)
+        if result.returncode:
+            print('Runtime unavailable. Run: ./p1sim dev bootstrap', file=sys.stderr)
+            return result.returncode
+        print('Ready for local simulation (ROS 2 Humble, Gazebo Fortress, software rendering).')
+    elif action == 'up':
+        compose('up', '-d')
+        deadline = time.monotonic() + 120
+        while time.monotonic() < deadline:
+            try:
+                status = endpoint('health')
+                if status['ready']:
+                    print('Simulation ready. Live view: http://localhost:' + ENV.get('P1SIM_STATUS_PORT', '8765'))
+                    return 0
+            except Exception:
+                pass
+            process_state = compose('ps', '-a', '--format', '{{.State}}', capture=True).stdout
+            if 'exited' in process_state.lower():
+                break
+            time.sleep(1)
+        compose('logs', '--tail', '60')
+        print('Simulation did not become ready; inspect ./p1sim dev logs', file=sys.stderr)
+        return 1
+    elif action == 'status':
+        print(json.dumps(endpoint(), indent=2))
+    elif action in ('shell', 'run'):
+        command = opts.args
+        if command[:1] == ['--']:
+            command = command[1:]
+        if action == 'shell':
+            command = ['bash']
+        if not command:
+            parser.error('dev run requires a command after --')
+        return execute(command, interactive=sys.stdin.isatty())
+    elif action == 'record':
+        if len(opts.args) != 1 or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}', opts.args[0]):
+            parser.error('record requires one name (letters, digits, dot, underscore, dash)')
+        name = opts.args[0]
+        print(f'Recording to {STATE}/bags/{name}; press Ctrl-C to finish.', flush=True)
+        endpoint('record/start', {'name': name})
+        try:
+            while True:
+                time.sleep(1)
+                if not endpoint()['recording']:
+                    raise RuntimeError('Recorder exited unexpectedly; inspect recording.log')
+        except KeyboardInterrupt:
+            result = endpoint('record/stop', {})
+            print(json.dumps(result))
+            return 0 if result['recording_exit'] in (0, -2) else 1
+    elif action == 'logs':
+        compose('logs', '--tail', '100')
+    elif action == 'reset':
+        compose('restart', 'simulator')
+        return subprocess.call([str(ROOT / 'p1sim'), 'dev', 'up'], env=ENV)
+    elif action == 'down':
+        compose('down', '--remove-orphans')
+        print('Simulation stopped. Logs and bags: ' + str(STATE))
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (subprocess.CalledProcessError, OSError, ValueError, RuntimeError) as error:
+        print(f'p1sim: {error}', file=sys.stderr)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        sys.exit(130)
