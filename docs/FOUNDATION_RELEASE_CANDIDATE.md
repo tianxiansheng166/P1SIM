@@ -93,3 +93,44 @@ models and sensor effects can use the extension API; they do not block this
 Foundation candidate. No known incompatible change to Developer V1 is needed.
 Changing existing defaults, field/unit/frame/clock meanings or plugin callback
 signatures would require the major-version process in compatibility.json.
+
+## Observed candidate verification
+
+[Compact evidence](foundation-observed.json) and [exact compressed data manifest](foundation-data-manifest.json)
+record the tested source, dependencies, negative results and cleanup.
+
+| Real default consumer | Max detection / tracking / control gap | Exact receipts |
+|---|---|---|
+| First clean 5 s window | 0.265 / 0.070 / 0.015 s | 2,362 / 2,362 |
+| Second clean 5 s window | 0.265 / 0.070 / 0.020 s | 2,278 / 2,278 |
+| 30 s window | 0.265 / 0.135 / 0.020 s | 11,429 / 11,429 |
+| Non-default timing, 5 s | 0.200 / 0.070 / 0.025 s | 2,261 / 2,261 |
+
+All windows passed the original 0.5 s maximum-outage gate, source-time TF,
+exact receipt sequences, applied JointState/TF, visible rendered targets and
+command-induced camera changes. Nine unit tests, public-image generic workflow,
+actual dynamics/blackout/reset/bag checks, three serial batch calls, linear/accel
+trajectory application, mounted external timing/world plugins, API rejection,
+external-stop and interrupted-startup cleanup passed. Private consumer source,
+parameters and model hashes match the accepted baseline.
+
+An earlier 30 s run failed at a 0.53 s tracking gap. Its original window and
+failure are retained. The default model was corrected to preserve exact
+absolute-angle same-clock application, and JointState velocity now clears
+while stationary. The later passing windows do not establish arbitrary-load
+robustness or isolate a single cause for the earlier detector/tracker loss.
+
+The 5/5/30 proof uses runtime commit `7c8453e`; subsequent commit `6d488a5`
+changes only host-side batch signal/process-group cleanup and its matrix test.
+All ROS/Gazebo module hashes match. That host change and the non-default
+consumer were verified on `6d488a5`. Later commits contain delivery evidence
+only. The public Dockerfile build used the supported mirror arguments after
+the default Ubuntu archive download stalled; no dependencies were piped into
+a shell or privately installed consumer assets included in the public image.
+
+Task containers and networks are absent. Twenty-two task-owned bags were
+compressed and their decompressed SHA-256 verified before removing the DB3
+copies, reclaiming 3,217,133,568 allocated bytes. Restore with `gzip -dk` before
+ROS bag access. Current candidate images and the clean task checkout remain;
+foreign/active Lane assets were untouched. Formal merge/tag/release is the
+remaining adoption gate.

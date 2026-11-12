@@ -1,0 +1,602 @@
+{
+  "task_id": "AA-P1SIM-T232",
+  "terminal": "P1SIM_FOUNDATION_V1_RELEASE_CANDIDATE_READY",
+  "foundation_version": "1.0.0",
+  "interface_version": 1,
+  "plugin_api_version": 1,
+  "proposed_tag": "v1.0.0-rc.1",
+  "accepted_base": "a6d551fd6df049c92e715bcdebf5c3516d7e344a",
+  "code_sha": "6d488a5a0c7fe2c3e6437d50d72d61834b6beb8b",
+  "tested_ros_runtime_commit": "7c8453e",
+  "host_signal_cleanup_commit": "6d488a5a0c7fe2c3e6437d50d72d61834b6beb8b",
+  "final_runtime_sha256": {
+    "p1sim_dev/plugins.py": "aadbab4b439e9032666d0e0d216da04fad22a15311f0b797e1d161d93ed8ae83",
+    "p1sim_dev/runtime.py": "4a64de2f589261210e33693f009a9b92e70f9a42c61f30f67cb71e0227f1d768",
+    "p1sim_dev/host.py": "05bf279d747d75586e158b7e40bc3e62fead27c7056fa69e4f4dd034cf6b812d",
+    "p1sim_dev/foundation.py": "7b29c8116739968bed1478bb29ed7f974616001f345c48aa02e90c88973846f3",
+    "p1sim_dev/config.py": "5f0fd1a70d4b8dfed6911f295b7cb8f21251e56df26299347fb0c2f61226f9e0",
+    "p1sim_dev/builtins.py": "95831a280c7d93e1427a74999cecf6f90b9b59178f764db88955d472380bbe33",
+    "p1sim_dev/__init__.py": "433c2c1bf147a151a7d4b783961a25b9e55d974e71aa924462aa4d4b7aec9060",
+    "p1sim_dev/command.py": "3e1782682fe103366bfcb16f3850a1de21501bd3adb207569545fb65fbabfc05",
+    "p1sim_dev/scene.py": "4951affae75d5e4c7110a7f8bf136874f7b88e950b9fc81ecf445a2dfbdf187e"
+  },
+  "runtime_hash_comparison": "Every runtime module matches the 5/5/30 proof; subsequent host.py-only process-group cleanup separately exercised by batch matrix",
+  "consumer": {
+    "source": "f380dde98d880fcd57d5e8f24dc0a76643fb6909",
+    "algorithm_production_yaml_git_diff": "EMPTY",
+    "owner_asset_sha256": {
+      "lib/detector/detector_node": "d45d121894d27a4b1da252da28bcc91f116e89dfc66f86bea0d8e19b74a98e9b",
+      "lib/rm_tracker/rm_tracker_node": "128a8e0230f61ba8e309a2189dc471f647a1b37bd2e3b816f6ffcf26919912df",
+      "lib/rm_planner/rm_planner_node": "42af5592458241839aa3169a63b844d772d449a4fecec95dadc8b6fe9ac16f75",
+      "share/rm_vision_bringup/config/node_params.yaml": "4c42300930cdd7f51e121224fb2b8d455fe4f488c990d002fd9cecd15977d543",
+      "share/pinyvision_models/models/armor/0526.xml": "996c50dd1a52ffcbe6ff657bc98ff073e5545e2a232c3951e9002cadc471cdf0",
+      "share/pinyvision_models/models/armor/0526.bin": "5ad4c00119b957e345d9b0a591be2e42fd77baadade8fce87d4a7902b275d699"
+    },
+    "asset_hashes_match_t230": true,
+    "private_assets_redistributed": false
+  },
+  "original_outcome": "Reusable P1SIM platform product through native CLI/ROS/Gazebo",
+  "gap_review_result": "All nine frozen gaps resolved at Developer platform level",
+  "integration_level": "I3 observed real unchanged consumer software attachment; no hardware or scientific qualification",
+  "unit_tests": {
+    "passed": true,
+    "count": 9,
+    "command": "python3 -m unittest discover -s tests -v"
+  },
+  "public_build": {
+    "passed": true,
+    "dockerfile": "Dockerfile",
+    "mirrors": "Supported Tsinghua Ubuntu/ROS build arguments",
+    "images": {
+      "p1sim-foundation:1.0.0-rc.1": "sha256:a1e1ca87fddbe52b9c6e0239696aa7d181a33ff18a072fe251a4cf1caacb6310",
+      "p1sim-foundation:t232": "sha256:cb59e1e680ad5375421d74adb7849ce1476b2509996cc0e05f65fc5818b5b692"
+    }
+  },
+  "generic_regression": {
+    "passed": true,
+    "checks": [
+      "doctor",
+      "up",
+      "live_view",
+      "smoke",
+      "consumer_tf",
+      "consumer_graph",
+      "consumer_launch",
+      "consumer_after_stop",
+      "recorded_smoke",
+      "record",
+      "bag_info",
+      "status",
+      "reset",
+      "reset_smoke",
+      "down",
+      "second_up",
+      "second_smoke",
+      "final_down"
+    ]
+  },
+  "autoaim_starts": [
+    {
+      "required_window_seconds": 5.0,
+      "sustained_window": [
+        4.425,
+        9.425
+      ],
+      "max_gap_sim_seconds": {
+        "detection": 0.26500000000000057,
+        "tracking": 0.07000000000000028,
+        "control": 0.015000000000000568
+      },
+      "receipts": 2362,
+      "exact_receipts": 2362,
+      "receipt_sequence_complete": true,
+      "every_application_joint_tf": true,
+      "command_induced_image_changes": 26,
+      "fully_in_fov": true,
+      "rendered_target_interior": true,
+      "pass": true,
+      "identity": {
+        "run_id": "ddc82d88b76742e1a2b8977c9ae372a8",
+        "run_key": "4940f6ad52d8e23edddbfcd6cf3f7ca67b93056d702011e54dddfcd22e9d273d",
+        "config_digest": "4940f6ad52d8e23edddbfcd6cf3f7ca67b93056d702011e54dddfcd22e9d273d",
+        "seed": 0,
+        "epoch": 0,
+        "source": {
+          "runtime_checksums": {
+            "p1sim_dev/__init__.py": "433c2c1bf147a151a7d4b783961a25b9e55d974e71aa924462aa4d4b7aec9060",
+            "p1sim_dev/builtins.py": "95831a280c7d93e1427a74999cecf6f90b9b59178f764db88955d472380bbe33",
+            "p1sim_dev/command.py": "3e1782682fe103366bfcb16f3850a1de21501bd3adb207569545fb65fbabfc05",
+            "p1sim_dev/config.py": "5f0fd1a70d4b8dfed6911f295b7cb8f21251e56df26299347fb0c2f61226f9e0",
+            "p1sim_dev/foundation.py": "7b29c8116739968bed1478bb29ed7f974616001f345c48aa02e90c88973846f3",
+            "p1sim_dev/host.py": "a9b36246b394f6b2d09fec944f042b702e192a8b2f9980049eb490ab345fe035",
+            "p1sim_dev/plugins.py": "aadbab4b439e9032666d0e0d216da04fad22a15311f0b797e1d161d93ed8ae83",
+            "p1sim_dev/runtime.py": "4a64de2f589261210e33693f009a9b92e70f9a42c61f30f67cb71e0227f1d768",
+            "p1sim_dev/scene.py": "4951affae75d5e4c7110a7f8bf136874f7b88e950b9fc81ecf445a2dfbdf187e",
+            "release.json": "05b80a91a20167832d5f52dfa600464b5b463bf334ddbac92ed0ed928dcded57",
+            "worlds/autoaim.sdf": "61952cd871f8998313f84d4011b9e067f8c312f7929a3db8297e3f042b1e2c0d",
+            "worlds/developer.sdf": "64445685d73d854d74ea2b2428e7e63165ff641f611380ffd6d1a1eb1b2ca3be"
+          },
+          "git_sha": "7c8453e4ebe3ee5bff402c09beb68f0bf4d6d60e",
+          "dirty": false,
+          "content_digest": "8428cb2d8c075b448b3174d5a7252925780b8cb919d0a963e1593f63afefea28",
+          "release": {
+            "product": "P1SIM Foundation",
+            "version": "1.0.0-rc.1",
+            "ros_distro": "humble",
+            "gazebo": "fortress",
+            "interface_version": 1,
+            "host": "Linux x86_64 with Docker Engine and Compose v2",
+            "rendering": "Mesa CPU headless",
+            "base_image": "ros:humble-ros-base@sha256:1813d3c85d7f96ff7d3012d865204583255740182db5d0065f8f8cd029a83138",
+            "runtime_build": "Dockerfile; apt package revisions resolved at build time",
+            "source_checksums": "SHA256SUMS",
+            "license": "MIT",
+            "scientific_qualification_claimed": false,
+            "foundation_version": "1.0.0",
+            "plugin_api_version": 1,
+            "config_version": 1
+          }
+        }
+      },
+      "source_time_tf": {
+        "sec": 4,
+        "nanosec": 555000000,
+        "frame": "camera_optical_frame",
+        "camera_info_sec": 4
+      },
+      "bag": "rc-autoaim/bags/sustained-1"
+    },
+    {
+      "required_window_seconds": 5.0,
+      "sustained_window": [
+        5.415,
+        10.415
+      ],
+      "max_gap_sim_seconds": {
+        "detection": 0.26500000000000057,
+        "tracking": 0.07000000000000028,
+        "control": 0.019999999999999574
+      },
+      "receipts": 2278,
+      "exact_receipts": 2278,
+      "receipt_sequence_complete": true,
+      "every_application_joint_tf": true,
+      "command_induced_image_changes": 25,
+      "fully_in_fov": true,
+      "rendered_target_interior": true,
+      "pass": true,
+      "identity": {
+        "run_id": "f01bcf0329d6487db1fa4f0acba97c28",
+        "run_key": "4940f6ad52d8e23edddbfcd6cf3f7ca67b93056d702011e54dddfcd22e9d273d",
+        "config_digest": "4940f6ad52d8e23edddbfcd6cf3f7ca67b93056d702011e54dddfcd22e9d273d",
+        "seed": 0,
+        "epoch": 0,
+        "source": {
+          "runtime_checksums": {
+            "p1sim_dev/__init__.py": "433c2c1bf147a151a7d4b783961a25b9e55d974e71aa924462aa4d4b7aec9060",
+            "p1sim_dev/builtins.py": "95831a280c7d93e1427a74999cecf6f90b9b59178f764db88955d472380bbe33",
+            "p1sim_dev/command.py": "3e1782682fe103366bfcb16f3850a1de21501bd3adb207569545fb65fbabfc05",
+            "p1sim_dev/config.py": "5f0fd1a70d4b8dfed6911f295b7cb8f21251e56df26299347fb0c2f61226f9e0",
+            "p1sim_dev/foundation.py": "7b29c8116739968bed1478bb29ed7f974616001f345c48aa02e90c88973846f3",
+            "p1sim_dev/host.py": "a9b36246b394f6b2d09fec944f042b702e192a8b2f9980049eb490ab345fe035",
+            "p1sim_dev/plugins.py": "aadbab4b439e9032666d0e0d216da04fad22a15311f0b797e1d161d93ed8ae83",
+            "p1sim_dev/runtime.py": "4a64de2f589261210e33693f009a9b92e70f9a42c61f30f67cb71e0227f1d768",
+            "p1sim_dev/scene.py": "4951affae75d5e4c7110a7f8bf136874f7b88e950b9fc81ecf445a2dfbdf187e",
+            "release.json": "05b80a91a20167832d5f52dfa600464b5b463bf334ddbac92ed0ed928dcded57",
+            "worlds/autoaim.sdf": "61952cd871f8998313f84d4011b9e067f8c312f7929a3db8297e3f042b1e2c0d",
+            "worlds/developer.sdf": "64445685d73d854d74ea2b2428e7e63165ff641f611380ffd6d1a1eb1b2ca3be"
+          },
+          "git_sha": "7c8453e4ebe3ee5bff402c09beb68f0bf4d6d60e",
+          "dirty": false,
+          "content_digest": "8428cb2d8c075b448b3174d5a7252925780b8cb919d0a963e1593f63afefea28",
+          "release": {
+            "product": "P1SIM Foundation",
+            "version": "1.0.0-rc.1",
+            "ros_distro": "humble",
+            "gazebo": "fortress",
+            "interface_version": 1,
+            "host": "Linux x86_64 with Docker Engine and Compose v2",
+            "rendering": "Mesa CPU headless",
+            "base_image": "ros:humble-ros-base@sha256:1813d3c85d7f96ff7d3012d865204583255740182db5d0065f8f8cd029a83138",
+            "runtime_build": "Dockerfile; apt package revisions resolved at build time",
+            "source_checksums": "SHA256SUMS",
+            "license": "MIT",
+            "scientific_qualification_claimed": false,
+            "foundation_version": "1.0.0",
+            "plugin_api_version": 1,
+            "config_version": 1
+          }
+        }
+      },
+      "source_time_tf": {
+        "sec": 5,
+        "nanosec": 615000000,
+        "frame": "camera_optical_frame",
+        "camera_info_sec": 5
+      },
+      "bag": "rc-autoaim/bags/sustained-2"
+    },
+    {
+      "required_window_seconds": 30.0,
+      "sustained_window": [
+        5.285,
+        35.285
+      ],
+      "max_gap_sim_seconds": {
+        "detection": 0.26500000000000057,
+        "tracking": 0.1349999999999998,
+        "control": 0.019999999999999574
+      },
+      "receipts": 11429,
+      "exact_receipts": 11429,
+      "receipt_sequence_complete": true,
+      "every_application_joint_tf": true,
+      "command_induced_image_changes": 152,
+      "fully_in_fov": true,
+      "rendered_target_interior": true,
+      "pass": true,
+      "identity": {
+        "run_id": "7ca5fca080d74c5ca135f1f7303188c0",
+        "run_key": "4940f6ad52d8e23edddbfcd6cf3f7ca67b93056d702011e54dddfcd22e9d273d",
+        "config_digest": "4940f6ad52d8e23edddbfcd6cf3f7ca67b93056d702011e54dddfcd22e9d273d",
+        "seed": 0,
+        "epoch": 0,
+        "source": {
+          "runtime_checksums": {
+            "p1sim_dev/__init__.py": "433c2c1bf147a151a7d4b783961a25b9e55d974e71aa924462aa4d4b7aec9060",
+            "p1sim_dev/builtins.py": "95831a280c7d93e1427a74999cecf6f90b9b59178f764db88955d472380bbe33",
+            "p1sim_dev/command.py": "3e1782682fe103366bfcb16f3850a1de21501bd3adb207569545fb65fbabfc05",
+            "p1sim_dev/config.py": "5f0fd1a70d4b8dfed6911f295b7cb8f21251e56df26299347fb0c2f61226f9e0",
+            "p1sim_dev/foundation.py": "7b29c8116739968bed1478bb29ed7f974616001f345c48aa02e90c88973846f3",
+            "p1sim_dev/host.py": "a9b36246b394f6b2d09fec944f042b702e192a8b2f9980049eb490ab345fe035",
+            "p1sim_dev/plugins.py": "aadbab4b439e9032666d0e0d216da04fad22a15311f0b797e1d161d93ed8ae83",
+            "p1sim_dev/runtime.py": "4a64de2f589261210e33693f009a9b92e70f9a42c61f30f67cb71e0227f1d768",
+            "p1sim_dev/scene.py": "4951affae75d5e4c7110a7f8bf136874f7b88e950b9fc81ecf445a2dfbdf187e",
+            "release.json": "05b80a91a20167832d5f52dfa600464b5b463bf334ddbac92ed0ed928dcded57",
+            "worlds/autoaim.sdf": "61952cd871f8998313f84d4011b9e067f8c312f7929a3db8297e3f042b1e2c0d",
+            "worlds/developer.sdf": "64445685d73d854d74ea2b2428e7e63165ff641f611380ffd6d1a1eb1b2ca3be"
+          },
+          "git_sha": "7c8453e4ebe3ee5bff402c09beb68f0bf4d6d60e",
+          "dirty": false,
+          "content_digest": "8428cb2d8c075b448b3174d5a7252925780b8cb919d0a963e1593f63afefea28",
+          "release": {
+            "product": "P1SIM Foundation",
+            "version": "1.0.0-rc.1",
+            "ros_distro": "humble",
+            "gazebo": "fortress",
+            "interface_version": 1,
+            "host": "Linux x86_64 with Docker Engine and Compose v2",
+            "rendering": "Mesa CPU headless",
+            "base_image": "ros:humble-ros-base@sha256:1813d3c85d7f96ff7d3012d865204583255740182db5d0065f8f8cd029a83138",
+            "runtime_build": "Dockerfile; apt package revisions resolved at build time",
+            "source_checksums": "SHA256SUMS",
+            "license": "MIT",
+            "scientific_qualification_claimed": false,
+            "foundation_version": "1.0.0",
+            "plugin_api_version": 1,
+            "config_version": 1
+          }
+        }
+      },
+      "source_time_tf": {
+        "sec": 5,
+        "nanosec": 480000000,
+        "frame": "camera_optical_frame",
+        "camera_info_sec": 5
+      },
+      "bag": "rc-autoaim/bags/sustained-3"
+    }
+  ],
+  "foundation_primitives": {
+    "passed": true,
+    "live_observer": {
+      "application_count": 18,
+      "timing_samples": 52,
+      "joint_velocity_observed": true,
+      "rate_limit_observed": true,
+      "delay_observed": true,
+      "blackout_source_stamps": [
+        2050000000,
+        4030000000,
+        4095000000
+      ]
+    },
+    "first_application": {
+      "schema": "p1sim.gimbal_applied",
+      "schema_version": 1,
+      "run_id": "ad487429a19a4c799ae3b4bb4fee418f",
+      "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+      "foundation_version": "1.0.0",
+      "interface_version": 1,
+      "plugin_api_version": 1,
+      "config_digest": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+      "seed": 42,
+      "epoch": 0,
+      "source": {
+        "runtime_checksums": {
+          "p1sim_dev/__init__.py": "433c2c1bf147a151a7d4b783961a25b9e55d974e71aa924462aa4d4b7aec9060",
+          "p1sim_dev/builtins.py": "95831a280c7d93e1427a74999cecf6f90b9b59178f764db88955d472380bbe33",
+          "p1sim_dev/command.py": "3e1782682fe103366bfcb16f3850a1de21501bd3adb207569545fb65fbabfc05",
+          "p1sim_dev/config.py": "5f0fd1a70d4b8dfed6911f295b7cb8f21251e56df26299347fb0c2f61226f9e0",
+          "p1sim_dev/foundation.py": "7b29c8116739968bed1478bb29ed7f974616001f345c48aa02e90c88973846f3",
+          "p1sim_dev/host.py": "05bf279d747d75586e158b7e40bc3e62fead27c7056fa69e4f4dd034cf6b812d",
+          "p1sim_dev/plugins.py": "aadbab4b439e9032666d0e0d216da04fad22a15311f0b797e1d161d93ed8ae83",
+          "p1sim_dev/runtime.py": "4a64de2f589261210e33693f009a9b92e70f9a42c61f30f67cb71e0227f1d768",
+          "p1sim_dev/scene.py": "4951affae75d5e4c7110a7f8bf136874f7b88e950b9fc81ecf445a2dfbdf187e",
+          "release.json": "05b80a91a20167832d5f52dfa600464b5b463bf334ddbac92ed0ed928dcded57",
+          "worlds/autoaim.sdf": "61952cd871f8998313f84d4011b9e067f8c312f7929a3db8297e3f042b1e2c0d",
+          "worlds/developer.sdf": "64445685d73d854d74ea2b2428e7e63165ff641f611380ffd6d1a1eb1b2ca3be"
+        },
+        "git_sha": "6d488a5a0c7fe2c3e6437d50d72d61834b6beb8b",
+        "dirty": false,
+        "content_digest": "85b20e519e8b33a501478198d0386bddb89ef1f97903cdec29e9b77a7b673d91",
+        "release": {
+          "product": "P1SIM Foundation",
+          "version": "1.0.0-rc.1",
+          "ros_distro": "humble",
+          "gazebo": "fortress",
+          "interface_version": 1,
+          "host": "Linux x86_64 with Docker Engine and Compose v2",
+          "rendering": "Mesa CPU headless",
+          "base_image": "ros:humble-ros-base@sha256:1813d3c85d7f96ff7d3012d865204583255740182db5d0065f8f8cd029a83138",
+          "runtime_build": "Dockerfile; apt package revisions resolved at build time",
+          "source_checksums": "SHA256SUMS",
+          "license": "MIT",
+          "scientific_qualification_claimed": false,
+          "foundation_version": "1.0.0",
+          "plugin_api_version": 1,
+          "config_version": 1
+        }
+      },
+      "yaw_rad": 0.00025000000000000044,
+      "pitch_rad": -0.00025000000000000044,
+      "v_rad_s": [
+        0.00012195121951219535,
+        -0.00012195121951219535
+      ],
+      "command_sequence": 1,
+      "receipt_time_ns": 1820000000,
+      "application_time_ns": 2050000000,
+      "simulation_time_ns": 2050000000,
+      "fire_supported": false
+    },
+    "bag_contract": {
+      "passed": true,
+      "counts": {
+        "/p1sim/target_state": 44,
+        "/p1sim/visibility": 70,
+        "/p1sim/camera_timing": 70,
+        "/p1sim/state": 18,
+        "/p1sim/command_received": 1,
+        "/p1sim/gimbal_applied": 18
+      }
+    },
+    "reset_before": {
+      "run_id": "ad487429a19a4c799ae3b4bb4fee418f",
+      "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+      "seed": 42,
+      "epoch": 0
+    },
+    "reset_after": {
+      "run_id": "ad487429a19a4c799ae3b4bb4fee418f",
+      "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+      "seed": 42,
+      "epoch": 1
+    }
+  },
+  "serial_batch": {
+    "passed": true,
+    "runs": [
+      {
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "42851d0cbf8349178f1ff1f54b34aa7d",
+          "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+          "exit_status": "COMPLETED",
+          "clean_teardown": true,
+          "simulation_elapsed_seconds": 3.075
+        },
+        "identity": {
+          "run_id": "42851d0cbf8349178f1ff1f54b34aa7d",
+          "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+          "seed": 42,
+          "epoch": 0
+        }
+      },
+      {
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "4d5de70fae4a4c3b9c971492a0d418ff",
+          "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+          "exit_status": "COMPLETED",
+          "clean_teardown": true,
+          "simulation_elapsed_seconds": 3.035
+        },
+        "identity": {
+          "run_id": "4d5de70fae4a4c3b9c971492a0d418ff",
+          "run_key": "728ca25389100773f0d6a158cc5015415b2ac5d3c44710e6ef90007ad8fe135b",
+          "seed": 42,
+          "epoch": 0
+        }
+      },
+      {
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "b521361cc2474227b4bbfd7dae2eca1f",
+          "run_key": "63a3267a43636455a52e31186d8f77ea5c6e07a4fffc5d232ebc286a4ead2170",
+          "exit_status": "COMPLETED",
+          "clean_teardown": true,
+          "simulation_elapsed_seconds": 3.075
+        },
+        "identity": {
+          "run_id": "b521361cc2474227b4bbfd7dae2eca1f",
+          "run_key": "63a3267a43636455a52e31186d8f77ea5c6e07a4fffc5d232ebc286a4ead2170",
+          "seed": 43,
+          "epoch": 0
+        }
+      }
+    ]
+  },
+  "matrix": {
+    "passed": true,
+    "cases": {
+      "linear": {
+        "passed": true,
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "ba45223e17fc4d93b6a48480d3265e3c",
+          "run_key": "044cf33041d460069c98fccc10844bba19fd34722d0f0a6f125958137fcbfc52",
+          "exit_status": "COMPLETED",
+          "clean_teardown": true,
+          "simulation_elapsed_seconds": 2.045
+        }
+      },
+      "accel": {
+        "passed": true,
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "29af6da4c8fa44edb3c85da0c44202cd",
+          "run_key": "1d06a4c51109f25643a27bc53dd8ce65471833d46bbebf97138620bfe954108b",
+          "exit_status": "COMPLETED",
+          "clean_teardown": true,
+          "simulation_elapsed_seconds": 2.015
+        }
+      },
+      "external": {
+        "passed": true
+      },
+      "incompatible": {
+        "passed": true,
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "5a7fdae43be545c0bbbdd78aa3a8006e",
+          "run_key": "deddc99045efd7d90899fff0cb9e724c17903d7498a61fbd18f00124684da3f6",
+          "exit_status": "FAILED",
+          "clean_teardown": true,
+          "error": "Command '['/home/tian/code/work/p1-sim-t232-foundation-v1-broad-release/p1sim', 'dev', 'up']' returned non-zero exit status 1."
+        }
+      },
+      "external_stop": {
+        "passed": true,
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "6eba69469c834f40828bd62ea96ba358",
+          "run_key": "c4f631bbc38260af1d49b261904fadc096fb090ccf16ae0765eb90dafbf2bf42",
+          "exit_status": "COMPLETED",
+          "clean_teardown": true,
+          "simulation_elapsed_seconds": 0.155
+        }
+      },
+      "interrupted_startup": {
+        "passed": true,
+        "result": {
+          "schema": "p1sim.batch_result",
+          "schema_version": 1,
+          "run_id": "b1f9a96607654bb78e43a8cbdfa2108d",
+          "run_key": "c4f631bbc38260af1d49b261904fadc096fb090ccf16ae0765eb90dafbf2bf42",
+          "exit_status": "INTERRUPTED",
+          "clean_teardown": true
+        }
+      }
+    }
+  },
+  "perturbed_consumer": {
+    "passed": true,
+    "timing_plugin": {
+      "entry": "p1sim_dev.builtins:Timing",
+      "version": "1.0.0",
+      "api_version": 1,
+      "source_sha256": "95831a280c7d93e1427a74999cecf6f90b9b59178f764db88955d472380bbe33",
+      "observables": [
+        "delay_seconds"
+      ],
+      "config": {
+        "delay_seconds": 0.01,
+        "jitter_seconds": 0.002
+      }
+    },
+    "sensor_effect": {
+      "dropped": false,
+      "occluded": false,
+      "calibration_scale": 1.0,
+      "delay_seconds": 0.00904582911873361
+    },
+    "observed_nodes": [
+      "detector",
+      "p1sim_environment",
+      "rm_planner",
+      "rm_tracker",
+      "ros_gz_bridge",
+      "rosbag2_recorder",
+      "transform_listener_impl_55c729adde30",
+      "transform_listener_impl_60682bf56b80",
+      "transform_listener_impl_62cf52f04e50",
+      "virtual_serial"
+    ],
+    "max_gap_sim_seconds": {
+      "detection": 0.1999999999999993,
+      "tracking": 0.07000000000000028,
+      "control": 0.024999999999999467
+    },
+    "receipts": 2261,
+    "exact_receipts": 2261,
+    "source_time_tf": {
+      "sec": 5,
+      "nanosec": 680000000,
+      "frame": "camera_optical_frame",
+      "camera_info_sec": 5
+    },
+    "algorithm_efficacy_claimed": false
+  },
+  "negative_evidence": [
+    {
+      "run": "final-autoaim/bags/sustained-3",
+      "source_commit": "c62bf37",
+      "window_seconds": 30,
+      "tracking_gap_seconds": 0.53,
+      "threshold_seconds": 0.5,
+      "result": "FAIL preserved; no threshold relaxation or alternate window selection",
+      "observed": "At 25.015s Tracker reported false after empty Detector frames; reacquired 25.480s",
+      "inference": "Default model used finite surrogate bounds and deferred same-clock commands; corrected to exact original absolute-angle path. Root-cause attribution to this alone is not established."
+    },
+    {
+      "run": "primitives",
+      "result": "Bag observer missed one early volatile receipt before DDS discovery; added recording settle and probe receipt retry",
+      "runtime_failure_claimed": false
+    }
+  ],
+  "resource_exit": {
+    "task_containers": 0,
+    "task_networks": 0,
+    "all_batch_results_verified_teardown": true,
+    "logical_bytes_saved": 3217134431,
+    "allocated_bytes_reclaimed": 3217133568,
+    "archive_count": 22,
+    "data_manifest_sha256": "27033414e2ba60ba26b2e48d17cee6fdb0580296db5ff7d59e0370c22b98a178",
+    "current_runtime_images_retained": true,
+    "foreign_assets_deleted": false
+  },
+  "result_verdict": "PASS_DEVELOPER_FOUNDATION",
+  "adoption_decision": "MERGE_READY_CANDIDATE; formal merge/tag/release requires Owner authorization after Return",
+  "exit_verdict": "NO_TASK_RUNTIME_OR_NETWORK; exact compressed evidence retained",
+  "remaining_foundation_v2_gaps": [],
+  "optional_future_plugins": [
+    "anti-spin/multi-armor world",
+    "physical motor",
+    "rich calibrated sensor models"
+  ],
+  "limitations": [
+    "Developer software proof for frozen source/model/profile; no algorithm efficacy or hardware claim",
+    "Analytic plugin determinism is not bitwise Gazebo/ROS scheduling determinism",
+    "Runtime pose services/render/TF remain asynchronous",
+    "One earlier 30s failure retained; successful rerun does not qualify arbitrary-load robustness"
+  ],
+  "policy_note": "Product checkout has no AGENTS.md/V2.2 marker; applied Task Card 17/17A and Commander-pinned a4f6bcfe overlay, with no policy changes"
+}

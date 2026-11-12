@@ -1,0 +1,226 @@
+{
+  "archives": [
+    {
+      "path": "final-autoaim/bags/sustained-1/sustained-1_0.db3.gz",
+      "original_sha256": "7c441f26c7aa153de0da90baae459037bd01fdc9b177f07e84ffe42428ef05a6",
+      "original_bytes": 155090944,
+      "archive_sha256": "9d01d71721b6f4c5c88930e055ee6678bccaad98b5fe0885e2e916bf811aeac7",
+      "archive_bytes": 2294801,
+      "original_allocated_bytes": 155095040,
+      "archive_allocated_bytes": 2297856,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "final-autoaim/bags/sustained-2/sustained-2_0.db3.gz",
+      "original_sha256": "f15252bd2f3f0897a698330aa1300fca85d340681a66939bce1921d16fd49536",
+      "original_bytes": 154071040,
+      "archive_sha256": "d5e66793e1e3f975c46377803b8ea9e17a4087a8565e34bbcfcae76c7f4b4dcd",
+      "archive_bytes": 2276426,
+      "original_allocated_bytes": 154075136,
+      "archive_allocated_bytes": 2277376,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "final-autoaim/bags/sustained-3/sustained-3_0.db3.gz",
+      "original_sha256": "d3bc5a79ab764f592f6dbea39a012b19b47ba282638cecaa89b2c87924362c0f",
+      "original_bytes": 532471808,
+      "archive_sha256": "8de427a1de781ad0e97223a090b39cb35a45dc722499bef20def7768096c8194",
+      "archive_bytes": 8331574,
+      "original_allocated_bytes": 532475904,
+      "archive_allocated_bytes": 8335360,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "generic/bags/acceptance-1794479497/acceptance-1794479497_0.db3.gz",
+      "original_sha256": "976c158c6d7eb36a81816b25f9233cb6987d077cf15ab93ff7365bf3e00af7fa",
+      "original_bytes": 100900864,
+      "archive_sha256": "0d890dfc78367f157a5e84242a4951d5652161621b15a75ace9b243f7842716e",
+      "archive_bytes": 1214050,
+      "original_allocated_bytes": 100904960,
+      "archive_allocated_bytes": 1216512,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "primitives/bags/foundation/foundation_0.db3.gz",
+      "original_sha256": "ed20180a836438dc60d7a089d275e6539b2eec2796762d03b3dbd20e48efed40",
+      "original_bytes": 43802624,
+      "archive_sha256": "d63507b7b1d5d36123d668b0d69518439c06e3bc0a2381760f72ecaa278f3ca1",
+      "archive_bytes": 481215,
+      "original_allocated_bytes": 43802624,
+      "archive_allocated_bytes": 483328,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "primitives-final/bags/foundation/foundation_0.db3.gz",
+      "original_sha256": "a6878eb60755c2510e15b4932b256b525e1eba8501068ebfb47d5dedfa46ebaf",
+      "original_bytes": 449871872,
+      "archive_sha256": "8fc77590226207b770f8e4518b9c56b5b37ba50daebe71e0c6ac3ab16b4b7d42",
+      "archive_bytes": 5600678,
+      "original_allocated_bytes": 449875968,
+      "archive_allocated_bytes": 5603328,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "primitives-verified/bags/foundation/foundation_0.db3.gz",
+      "original_sha256": "27f798d05eebf4d80a4c91e4e445d355115e44f1ebf78bcd47024b62681cde4a",
+      "original_bytes": 68595712,
+      "archive_sha256": "6bde78196e7396c75e9d015d2596c18a010dbced018f266052944ce56e743143",
+      "archive_bytes": 790177,
+      "original_allocated_bytes": 68595712,
+      "archive_allocated_bytes": 790528,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "probe-extensions/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "ffbd86cdec580c93ab9b5983598797f9e3cf52045af48ada34fba669621a1f2a",
+      "original_bytes": 39665664,
+      "archive_sha256": "8257378ca2da529b8263a7fc5f7160485e050e7722b28142e92aaffa2155f294",
+      "archive_bytes": 471345,
+      "original_allocated_bytes": 39669760,
+      "archive_allocated_bytes": 475136,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-autoaim/bags/sustained-1/sustained-1_0.db3.gz",
+      "original_sha256": "47d79e8179681260b332740cf5610be0bce54603f0ec771b1d8dc6820eca722f",
+      "original_bytes": 152485888,
+      "archive_sha256": "a89e0bdfc888dfc36e452b1d825ad1f363df9ed4a0ea8eee13b2b3f772508e0f",
+      "archive_bytes": 2266934,
+      "original_allocated_bytes": 152485888,
+      "archive_allocated_bytes": 2269184,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-autoaim/bags/sustained-2/sustained-2_0.db3.gz",
+      "original_sha256": "e02e2b0dca47bcb92e069af79dcc8a1ea160a693a2daec2fad998c631ea683cb",
+      "original_bytes": 148361216,
+      "archive_sha256": "7525fc0186a42c6ec4865d2f411dc69ed4bbcf632ea4c8774d73845c02f8e1dd",
+      "archive_bytes": 2202090,
+      "original_allocated_bytes": 148361216,
+      "archive_allocated_bytes": 2203648,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-autoaim/bags/sustained-3/sustained-3_0.db3.gz",
+      "original_sha256": "05b20fd3ec62f8dbcb84ad54582ac4bb6749c5cc440abff9adab4a8fdfbd8578",
+      "original_bytes": 534843392,
+      "archive_sha256": "4c0f265f985ed946b80da91d4e97e24c934edd5c7829012a6372bde70e2b5b39",
+      "archive_bytes": 8361566,
+      "original_allocated_bytes": 534847488,
+      "archive_allocated_bytes": 8364032,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-generic/bags/acceptance-1794480363/acceptance-1794480363_0.db3.gz",
+      "original_sha256": "4033bfaff38dcec843307c9cd404b4ff735517587c95b8924b4b7fedfd303714",
+      "original_bytes": 101265408,
+      "archive_sha256": "2a087c352519802a038622aa8497bbf7450decb40a3b9481fb829cddbba3bbcc",
+      "archive_bytes": 1299039,
+      "original_allocated_bytes": 101269504,
+      "archive_allocated_bytes": 1302528,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-perturbed/bags/sustained-1/sustained-1_0.db3.gz",
+      "original_sha256": "04238c80779840782ddbf728fde8c532fade9f37e5fc0cde375f42fd3f2c560c",
+      "original_bytes": 152944640,
+      "archive_sha256": "6533c484047ff0034bf065323eb4f4bb975236d4edb69575010ecab17c35906b",
+      "archive_bytes": 2262785,
+      "original_allocated_bytes": 152948736,
+      "archive_allocated_bytes": 2265088,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-primitives/bags/foundation/foundation_0.db3.gz",
+      "original_sha256": "26764cde8223917146e76bad0106d48325de73fdaad70ab5a1850ad0f8daa1ae",
+      "original_bytes": 65671168,
+      "archive_sha256": "429467b1b874407bc5ba0047651b77b6b0813837a4f8c8be2f3dd8062737f069",
+      "archive_bytes": 736562,
+      "original_allocated_bytes": 65671168,
+      "archive_allocated_bytes": 737280,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-serial/0/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "baa2335b90e028cbee360736780b528a585056dd276c835607b18f9629811c32",
+      "original_bytes": 38952960,
+      "archive_sha256": "25047799e17e3b7a4dc3bc561564d318307ffbc4d9d55b1d2a47090c7183965d",
+      "archive_bytes": 495166,
+      "original_allocated_bytes": 38952960,
+      "archive_allocated_bytes": 495616,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-serial/1/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "55d7164ff1ef41aac5113cb6b7c6327b3c677fb5c7aae6c725691d1c7084facb",
+      "original_bytes": 41824256,
+      "archive_sha256": "49ef408024182cd1be9a0566eb16cc6dda371a7abaddf2e9bfd36a7974d7f326",
+      "archive_bytes": 531478,
+      "original_allocated_bytes": 41824256,
+      "archive_allocated_bytes": 532480,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "rc-serial/2/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "9a873d18dbc6a9e0e262e5e547169520e74d184d37c21666d897fe920d466755",
+      "original_bytes": 38961152,
+      "archive_sha256": "2656e0c7777a26c9271c1e039a7e044dbe6f43f2c3d4e1fbe07d31ccd90a188a",
+      "archive_bytes": 494823,
+      "original_allocated_bytes": 38961152,
+      "archive_allocated_bytes": 495616,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "serial/0/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "08e9999e70ccc30a51ec8c8c7a21ea07d17cc972f8f92d8a352789ac32673add",
+      "original_bytes": 41545728,
+      "archive_sha256": "1962ea3187031a6e28778f789690820eecc50f911c06cdb2d32e7d27f287c5f8",
+      "archive_bytes": 493200,
+      "original_allocated_bytes": 41545728,
+      "archive_allocated_bytes": 495616,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "serial/1/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "2bdee1a25bd9b56c1ff29a6c416a49efb1b96cf0c169fa9f22fd149752e8133e",
+      "original_bytes": 41541632,
+      "archive_sha256": "402e78402654c83a38c2a6842aaa870b2687ea5c295e317ff518095fbfc17f00",
+      "archive_bytes": 494370,
+      "original_allocated_bytes": 41541632,
+      "archive_allocated_bytes": 495616,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "serial/2/runtime/bags/batch/batch_0.db3.gz",
+      "original_sha256": "d385007ccb497318da8edec632e638c6f90f85888905c71c7dcbb120274a1743",
+      "original_bytes": 40611840,
+      "archive_sha256": "f997f63b911270b81cdbf9c195a69c23a3a76154652277fafddb6a3c03405517",
+      "archive_bytes": 483800,
+      "original_allocated_bytes": 40611840,
+      "archive_allocated_bytes": 487424,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "sustained/bags/sustained-1/sustained-1_0.db3.gz",
+      "original_sha256": "caffff17810dd2536cad1b47660abbf51ae6d13afd906ae4768f732c08a620a6",
+      "original_bytes": 163348480,
+      "archive_sha256": "9f61003f284b235a6f629edcbc961215f53bcc17be54820dab7f16a40a1b6c22",
+      "archive_bytes": 2394289,
+      "original_allocated_bytes": 163352576,
+      "archive_allocated_bytes": 2396160,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    },
+    {
+      "path": "sustained/bags/sustained-2/sustained-2_0.db3.gz",
+      "original_sha256": "c7cefc6847d482a4599bae9470f81c2fd0e28b0346a63bb72d9b76c9544db947",
+      "original_bytes": 156585984,
+      "archive_sha256": "96df71cf31d595b89df4e828c6589d402072d6a410e6c5407a9be62fa6feb51a",
+      "archive_bytes": 2303473,
+      "original_allocated_bytes": 156590080,
+      "archive_allocated_bytes": 2306048,
+      "retention": "EXACT_GZIP; gzip -dk before ROS bag read"
+    }
+  ],
+  "logical_bytes_saved": 3217134431,
+  "allocated_bytes_reclaimed": 3217133568
+}
