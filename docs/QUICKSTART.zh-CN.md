@@ -17,6 +17,8 @@ python3 --version
 
 如果 Docker 权限不足，请按 [Docker 官方 Linux 安装与权限文档](https://docs.docker.com/engine/install/) 配置；P1SIM 不会自动执行 `sudo`、添加用户到特权组或修改系统权限。
 
+`dev doctor` 只检查已安装的镜像和依赖，不会擅自拉取或构建镜像。若镜像不存在会明确提示先执行 `./p1sim dev bootstrap`。
+
 ## 2. 克隆、构建、检查
 
 ```bash

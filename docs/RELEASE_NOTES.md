@@ -1,5 +1,19 @@
 # Foundation 1.0 — public developer-source preview
 
+## Preview 2 maintenance (first-run UX)
+
+- `dev doctor` now checks the selected local Docker image before starting an
+  inspection container. It immediately reports the required `dev bootstrap`
+  command if the image has not been built; no hidden Docker Hub pull or image
+  build is initiated by `doctor`.
+- Successful diagnostics force `--pull never`, preserving the explicit
+  source-self-build model. Regression tests cover missing and installed images.
+- The existing Foundation API/config/schema versions remain at 1.0.0/1.
+- An isolated public-archive `bootstrap` attempt hit a local wall-time guard
+  while downloading Ubuntu apt metadata; this is a `BOOTSTRAP_UNVERIFIED`
+  outcome, not a successful fresh-host installation. See optional apt mirrors
+  in the Chinese quickstart. Second-machine acceptance remains open.
+
 ## Included
 
 - Local ROS 2 Humble / Gazebo Fortress CPU-headless environment and CLI.

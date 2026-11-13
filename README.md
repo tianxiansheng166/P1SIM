@@ -132,7 +132,8 @@ bitwise deterministic sensor scheduling or a scoring framework.
 
 ## Troubleshooting
 
-`doctor` validates Docker and installed ROS/Gazebo dependencies. If the runtime
+`doctor` validates Docker and installed ROS/Gazebo dependencies without
+silently pulling or building a missing image. If the runtime
 image is missing, run `bootstrap`. `up` waits for live clock and camera data;
 a failed start is a product error and returns nonzero. Inspect `logs` and the
 state directory; software-rendered camera initialization can take longer on

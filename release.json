@@ -17,5 +17,6 @@
   "observable_schema_version": 1,
   "distribution": "public-source-self-build",
   "publication_track": "developer-preview",
+  "source_preview": "1.0.0-foundation-preview.2",
   "second_host_accepted": false
 }
